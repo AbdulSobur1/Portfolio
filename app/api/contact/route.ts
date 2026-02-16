@@ -2,6 +2,11 @@ import { NextResponse } from "next/server"
 
 const CONTACT_EMAIL = "abdullahabdulsobur@gmail.com"
 
+function createReferenceId() {
+  const rand = Math.random().toString(36).slice(2, 8).toUpperCase()
+  return `MSG-${Date.now().toString().slice(-6)}-${rand}`
+}
+
 export async function POST(request: Request) {
   try {
     const { name, email, message } = (await request.json()) as {
@@ -68,9 +73,12 @@ export async function POST(request: Request) {
       )
     }
 
+    const referenceId = createReferenceId()
+
     return NextResponse.json({
       success: true,
       message: "The form was submitted successfully.",
+      referenceId,
     })
   } catch {
     return NextResponse.json(

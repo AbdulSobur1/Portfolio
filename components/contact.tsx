@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Send } from "lucide-react"
+import { Calendar, Send } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -9,9 +9,9 @@ import { SectionWrapper } from "@/components/section-wrapper"
 import { SectionHeader } from "@/components/section-header"
 import { FormField } from "@/components/form-field"
 import { SOCIAL_LINKS } from "@/lib/constants"
+import { CONTACT_EMAIL, SCHEDULING_URL } from "@/lib/constants"
 
 export function Contact() {
-  const CONTACT_EMAIL = "abdullahabdulsobur@gmail.com"
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -21,6 +21,7 @@ export function Contact() {
   const [submitted, setSubmitted] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
+  const [referenceId, setReferenceId] = useState<string | null>(null)
 
   const validate = () => {
     const newErrors: Record<string, string> = {}
@@ -77,6 +78,7 @@ export function Contact() {
       }
 
       setSubmitted(true)
+      setReferenceId(typeof result.referenceId === "string" ? result.referenceId : null)
       setFormData({ name: "", email: "", message: "" })
     } catch (error) {
       const message =
@@ -99,6 +101,12 @@ export function Contact() {
             heading="Let's build something great."
             description="Whether you have a project in mind, need a technical co-founder, or just want to chat about engineering — I'd love to hear from you."
           />
+          <Button variant="outline" className="w-fit gap-2" asChild>
+            <a href={SCHEDULING_URL} target="_blank" rel="noopener noreferrer">
+              Book Intro Call
+              <Calendar className="h-4 w-4" />
+            </a>
+          </Button>
 
           {/* Social links */}
           <nav aria-label="Social media links" className="flex flex-col gap-3 pt-4">
@@ -137,6 +145,9 @@ export function Contact() {
                 <p className="text-sm text-muted-foreground">
                   {"Thanks for reaching out. I'll get back to you within 24 hours."}
                 </p>
+                {referenceId ? (
+                  <p className="text-xs text-accent font-mono">Reference ID: {referenceId}</p>
+                ) : null}
               </div>
               <Button
                 variant="outline"

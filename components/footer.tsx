@@ -28,6 +28,9 @@ export function Footer() {
               </a>
             ))}
           </nav>
+          <span className="text-xs text-muted-foreground">
+            Press Ctrl/Cmd + K for quick navigation
+          </span>
         </div>
       </div>
     </footer>

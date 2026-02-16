@@ -1,9 +1,9 @@
 import { ExternalLink, Github, Star, GitFork } from "lucide-react"
+import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
 import { SectionWrapper } from "@/components/section-wrapper"
 import { SectionHeader } from "@/components/section-header"
-
-const GITHUB_USERNAME = "AbdulSobur1"
+import { GITHUB_USERNAME } from "@/lib/constants"
 
 type GithubRepo = {
   id: number
@@ -16,6 +16,7 @@ type GithubRepo = {
   forks_count: number
   updated_at: string
   fork: boolean
+  archived?: boolean
 }
 
 async function getProjects(): Promise<GithubRepo[]> {
@@ -53,7 +54,7 @@ export async function Projects() {
         <SectionHeader
           label="Projects"
           heading="Projects from my GitHub."
-          description="Selected repositories from my public GitHub profile."
+          description="Selected repositories from my public GitHub profile with case-study links."
         />
 
         {projects.length === 0 ? (
@@ -72,9 +73,28 @@ export async function Projects() {
                 className="rounded-xl border border-border bg-card p-6 flex flex-col gap-4 hover:border-accent/30 transition-colors"
               >
                 <div className="flex items-start justify-between gap-3">
-                  <h3 className="text-lg font-semibold text-foreground break-all">
-                    {project.name}
-                  </h3>
+                  <div>
+                    <h3 className="text-lg font-semibold text-foreground break-all">
+                      <Link href={`/projects/${project.name}`} className="hover:text-accent transition-colors">
+                        {project.name}
+                      </Link>
+                    </h3>
+                    <div className="mt-1 flex flex-wrap gap-1.5">
+                      {project.archived ? (
+                        <Badge variant="secondary" className="text-[10px]">
+                          Archived
+                        </Badge>
+                      ) : project.homepage ? (
+                        <Badge variant="secondary" className="text-[10px]">
+                          Live
+                        </Badge>
+                      ) : (
+                        <Badge variant="secondary" className="text-[10px]">
+                          Code only
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
                   <a
                     href={project.html_url}
                     target="_blank"
@@ -102,6 +122,10 @@ export async function Projects() {
                 </div>
 
                 <div className="mt-auto flex flex-wrap items-center gap-2">
+                  <Link href={`/projects/${project.name}`} className="inline-flex items-center gap-1 text-xs text-accent hover:underline">
+                    Case Study
+                    <ExternalLink className="h-3.5 w-3.5" />
+                  </Link>
                   {project.language ? (
                     <Badge
                       variant="secondary"

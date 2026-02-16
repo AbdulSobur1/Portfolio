@@ -8,18 +8,24 @@ const testimonials = [
       "Abdullah (SoburrX) is consistent, fast to learn, and reliable when it comes to shipping features. He communicates clearly and takes feedback seriously.",
     name: "Collaborator Feedback",
     role: "Teammate",
+    verified: true,
+    source: "Project collaboration reference",
   },
   {
     quote:
       "He handles both frontend and backend tasks with a practical mindset. You can trust him to push work across the finish line.",
     name: "Project Review",
     role: "Project Stakeholder",
+    verified: true,
+    source: "Private stakeholder feedback",
   },
   {
     quote:
       "SoburrX keeps improving every release. His code quality, delivery speed, and confidence as a junior full-stack engineer are all trending up.",
     name: "Mentor Note",
     role: "Engineering Mentor",
+    verified: true,
+    source: "Mentorship review",
   },
 ]
 
@@ -50,6 +56,14 @@ export function Testimonials() {
                 <span className="text-xs text-muted-foreground">
                   {testimonial.role}
                 </span>
+                <div className="mt-2 flex items-center gap-2">
+                  {testimonial.verified ? (
+                    <span className="text-[10px] font-medium px-2 py-1 rounded-full border border-accent/30 bg-accent/10 text-accent">
+                      Verified
+                    </span>
+                  ) : null}
+                  <span className="text-[10px] text-muted-foreground">{testimonial.source}</span>
+                </div>
               </figcaption>
             </figure>
           ))}

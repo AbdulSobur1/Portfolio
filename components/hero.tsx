@@ -1,8 +1,9 @@
 "use client"
 
-import { ArrowRight, ArrowDown } from "lucide-react"
+import { ArrowRight, ArrowDown, Calendar } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useEffect, useState } from "react"
+import { HIRE_ME_URL, SCHEDULING_URL } from "@/lib/constants"
 
 function usePrefersReducedMotion() {
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
@@ -88,6 +89,23 @@ export function Hero() {
             >
               <a href="#projects">View Projects</a>
             </Button>
+            <Button
+              variant="outline"
+              size="lg"
+              className="h-12 px-8 text-base"
+              asChild
+            >
+              <a href={SCHEDULING_URL} target="_blank" rel="noopener noreferrer">
+                Book Intro Call
+                <Calendar className="ml-2 h-4 w-4" />
+              </a>
+            </Button>
+          </div>
+
+          <div className="flex items-center gap-4 text-sm">
+            <a href={HIRE_ME_URL} className="text-accent hover:underline">
+              Download Hire-Me One Pager
+            </a>
           </div>
 
           {/* Quick stats */}

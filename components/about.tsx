@@ -2,6 +2,7 @@ import { Download } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { SectionWrapper } from "@/components/section-wrapper"
 import { SectionHeader } from "@/components/section-header"
+import { HIRE_ME_URL, RESUME_URL } from "@/lib/constants"
 
 export function About() {
   return (
@@ -30,11 +31,17 @@ export function About() {
               }
             </p>
           </div>
-          <div>
+          <div className="flex flex-wrap gap-3">
             <Button variant="outline" className="gap-2" asChild>
-              <a href="/resume.pdf" download>
+              <a href={RESUME_URL} download>
                 <Download className="h-4 w-4" />
                 Download Resume
+              </a>
+            </Button>
+            <Button variant="outline" className="gap-2" asChild>
+              <a href={HIRE_ME_URL} download>
+                <Download className="h-4 w-4" />
+                Download Hire-Me PDF
               </a>
             </Button>
           </div>

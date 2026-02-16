@@ -1,34 +1,9 @@
 import { ArrowUpRight } from "lucide-react"
+import Link from "next/link"
 import { SectionWrapper } from "@/components/section-wrapper"
 import { SectionHeader } from "@/components/section-header"
 import { Badge } from "@/components/ui/badge"
-
-const articles = [
-  {
-    title: "Why I Rebuilt Our Entire Frontend with Server Components",
-    excerpt:
-      "A deep dive into migrating a 200K LOC React SPA to Next.js App Router — the wins, the pitfalls, and everything I learned along the way.",
-    date: "Jan 2026",
-    readTime: "12 min read",
-    tags: ["Next.js", "Architecture"],
-  },
-  {
-    title: "The Art of Scaling WebSocket Connections to 1M+",
-    excerpt:
-      "How we designed a horizontally scalable WebSocket infrastructure that handles millions of concurrent connections with sub-50ms latency.",
-    date: "Nov 2025",
-    readTime: "15 min read",
-    tags: ["Systems Design", "Performance"],
-  },
-  {
-    title: "From Learning to Shipping: What Helped Me Improve Fast",
-    excerpt:
-      "How I improved by focusing on hands-on coding, shipping features, and learning from project feedback as a junior full-stack engineer.",
-    date: "Sep 2025",
-    readTime: "8 min read",
-    tags: ["Career", "Startups"],
-  },
-]
+import { WRITING_POSTS } from "@/lib/content"
 
 export function Blog() {
   return (
@@ -42,13 +17,13 @@ export function Blog() {
 
         {/* Article list */}
         <div className="flex flex-col gap-0 divide-y divide-border" role="list" aria-label="Blog articles">
-          {articles.map((article, index) => (
+          {WRITING_POSTS.map((article) => (
             <article
-              key={index}
+              key={article.slug}
               role="listitem"
               className="group py-6 first:pt-0 last:pb-0"
             >
-              <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-6">
+              <Link href={`/writing/${article.slug}`} className="flex flex-col md:flex-row md:items-center gap-3 md:gap-6">
                 <div className="flex-1 flex flex-col gap-1.5">
                   <h3 className="text-base font-semibold text-foreground group-hover:text-accent transition-colors flex items-center gap-2">
                     {article.title}
@@ -59,7 +34,7 @@ export function Blog() {
                   </p>
                   <div className="flex items-center gap-3 mt-1">
                     <time className="text-xs text-muted-foreground font-mono">
-                      {article.date}
+                      {new Date(article.date).toLocaleDateString("en-US", { dateStyle: "medium" })}
                     </time>
                     <span className="text-xs text-muted-foreground">
                       {article.readTime}
@@ -77,10 +52,13 @@ export function Blog() {
                     </div>
                   </div>
                 </div>
-              </div>
+              </Link>
             </article>
           ))}
         </div>
+        <Link href="/writing" className="text-sm text-accent hover:underline w-fit">
+          View all writing →
+        </Link>
       </div>
     </SectionWrapper>
   )
