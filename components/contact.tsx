@@ -47,34 +47,43 @@ export function Contact() {
     setIsSubmitting(true)
 
     try {
-      const response = await fetch(`https://formsubmit.co/ajax/${CONTACT_EMAIL}`, {
+      const response = await fetch("/api/contact", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Accept: "application/json",
         },
         body: JSON.stringify({
           name: formData.name,
           email: formData.email,
           message: formData.message,
-          _subject: "New portfolio contact message",
-          _captcha: "false",
         }),
       })
 
+      const result = await response.json()
       if (!response.ok) {
-        throw new Error("Failed to submit form")
+        throw new Error(
+          typeof result?.message === "string"
+            ? result.message
+            : "Failed to submit form"
+        )
       }
 
-      const result = await response.json()
       if (!(result.success === true || result.success === "true")) {
-        throw new Error("Submission service returned an error")
+        throw new Error(
+          typeof result?.message === "string"
+            ? result.message
+            : "Submission service returned an error"
+        )
       }
 
       setSubmitted(true)
       setFormData({ name: "", email: "", message: "" })
-    } catch {
-      setSubmitError("Could not send message right now. Please try again shortly.")
+    } catch (error) {
+      const message =
+        error instanceof Error && error.message
+          ? error.message
+          : "Could not send message right now. Please try again shortly."
+      setSubmitError(message)
     } finally {
       setIsSubmitting(false)
     }
@@ -205,9 +214,15 @@ export function Contact() {
               </FormField>
 
               {submitError ? (
-                <p role="alert" className="text-sm text-destructive">
-                  {submitError}
-                </p>
+                <div role="alert" className="text-sm text-destructive flex flex-col gap-2">
+                  <p>{submitError}</p>
+                  <a
+                    href={`mailto:${CONTACT_EMAIL}`}
+                    className="text-accent hover:underline"
+                  >
+                    Or email me directly at {CONTACT_EMAIL}
+                  </a>
+                </div>
               ) : null}
 
               <Button
