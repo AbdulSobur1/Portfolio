@@ -200,10 +200,7 @@ export function Navigation() {
         <button
           type="button"
           aria-label="Close navigation menu"
-          className={cn(
-            "absolute inset-0 bg-background/70 backdrop-blur-sm transition-opacity duration-300",
-            isMobileOpen ? "opacity-100" : "opacity-0"
-          )}
+          className="absolute inset-0 bg-background"
           onClick={() => {
             setIsMobileOpen(false)
             menuButtonRef.current?.focus()
@@ -212,30 +209,32 @@ export function Navigation() {
 
         <div
           className={cn(
-            "relative m-4 rounded-xl border border-border bg-card/95 shadow-lg transition-all duration-300",
+            "relative h-full px-4 pt-4 pb-6",
             isMobileOpen ? "translate-y-0 opacity-100" : "-translate-y-3 opacity-0"
           )}
         >
-          <div className="flex flex-col gap-1 p-3">
-            {navLinks.map((link) => {
-              const isActive = activeSection === link.href.slice(1)
-              return (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setIsMobileOpen(false)}
-                  aria-current={isActive ? "true" : undefined}
-                  className={cn(
-                    "px-4 py-3 text-base font-medium rounded-lg transition-colors",
-                    isActive
-                      ? "text-foreground bg-muted"
-                      : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                  )}
-                >
-                  {link.label}
-                </a>
-              )
-            })}
+          <div className="h-full overflow-y-auto rounded-xl border border-border bg-card shadow-lg">
+            <div className="flex flex-col gap-1 p-3">
+              {navLinks.map((link) => {
+                const isActive = activeSection === link.href.slice(1)
+                return (
+                  <a
+                    key={link.href}
+                    href={link.href}
+                    onClick={() => setIsMobileOpen(false)}
+                    aria-current={isActive ? "true" : undefined}
+                    className={cn(
+                      "px-4 py-3 text-base font-medium rounded-lg transition-colors",
+                      isActive
+                        ? "text-foreground bg-muted"
+                        : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                    )}
+                  >
+                    {link.label}
+                  </a>
+                )
+              })}
+            </div>
           </div>
         </div>
       </div>
