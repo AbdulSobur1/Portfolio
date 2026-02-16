@@ -47,6 +47,7 @@ export default async function ProjectCaseStudyPage({ params }: { params: Params 
   if (!repo) notFound()
 
   const status = repo.archived ? "Archived" : repo.homepage ? "Live" : "Code only"
+  const screenshotUrl = `https://opengraph.githubassets.com/1/${GITHUB_USERNAME}/${repo.name}`
 
   return (
     <main className="min-h-screen px-4 md:px-6 lg:px-8 py-24">
@@ -67,6 +68,15 @@ export default async function ProjectCaseStudyPage({ params }: { params: Params 
         <p className="text-muted-foreground mt-3 leading-relaxed">
           {repo.description ?? "This project showcases practical full-stack engineering decisions and delivery."}
         </p>
+
+        <div className="mt-6 overflow-hidden rounded-xl border border-border bg-muted/20">
+          <img
+            src={screenshotUrl}
+            alt={`${repo.name} repository preview`}
+            className="w-full h-auto"
+            loading="lazy"
+          />
+        </div>
 
         <div className="mt-6 grid sm:grid-cols-3 gap-4 text-sm">
           <div className="rounded-lg border border-border p-3 bg-muted/30">
@@ -129,4 +139,3 @@ export default async function ProjectCaseStudyPage({ params }: { params: Params 
     </main>
   )
 }
-

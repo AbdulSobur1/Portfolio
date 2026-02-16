@@ -44,14 +44,14 @@ export async function GithubActivity() {
 
   return (
     <SectionWrapper id="github-activity">
-      <div className="flex flex-col gap-12">
+      <div className="flex flex-col gap-10 md:gap-12">
         <SectionHeader
           label="GitHub"
           heading="Public activity and top repositories."
           description="Live data from my GitHub profile."
         />
-        <div className="grid md:grid-cols-2 gap-6">
-          <div className="rounded-xl border border-border bg-card p-6">
+        <div className="grid md:grid-cols-2 gap-4 md:gap-6">
+          <div className="rounded-xl border border-border bg-card p-5 md:p-6">
             <h3 className="text-base font-semibold text-foreground mb-4">Top Repositories</h3>
             <div className="flex flex-col gap-3">
               {repos.length === 0 ? (
@@ -72,7 +72,7 @@ export async function GithubActivity() {
               )}
             </div>
           </div>
-          <div className="rounded-xl border border-border bg-card p-6">
+          <div className="rounded-xl border border-border bg-card p-5 md:p-6">
             <h3 className="text-base font-semibold text-foreground mb-4">Recent Public Events</h3>
             <div className="flex flex-col gap-3">
               {events.length === 0 ? (
@@ -92,4 +92,3 @@ export async function GithubActivity() {
     </SectionWrapper>
   )
 }
-

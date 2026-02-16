@@ -75,7 +75,7 @@ export async function Projects() {
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <h3 className="text-lg font-semibold text-foreground break-all">
-                      <Link href={`/projects/${project.name}`} className="hover:text-accent transition-colors">
+                      <Link href={`/projects/${encodeURIComponent(project.name)}`} className="hover:text-accent transition-colors">
                         {project.name}
                       </Link>
                     </h3>
@@ -122,7 +122,7 @@ export async function Projects() {
                 </div>
 
                 <div className="mt-auto flex flex-wrap items-center gap-2">
-                  <Link href={`/projects/${project.name}`} className="inline-flex items-center gap-1 text-xs text-accent hover:underline">
+                  <Link href={`/projects/${encodeURIComponent(project.name)}`} className="inline-flex items-center gap-1 text-xs text-accent hover:underline">
                     Case Study
                     <ExternalLink className="h-3.5 w-3.5" />
                   </Link>

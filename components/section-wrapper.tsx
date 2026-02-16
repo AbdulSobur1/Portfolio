@@ -50,7 +50,7 @@ export function SectionWrapper({ children, className, id }: SectionWrapperProps)
       ref={ref}
       id={id}
       className={cn(
-        "py-20 px-4 md:px-6 lg:px-8",
+        "py-16 md:py-20 px-4 md:px-6 lg:px-8",
         !prefersReducedMotion && "transition-all duration-700 ease-out",
         isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8",
         className
