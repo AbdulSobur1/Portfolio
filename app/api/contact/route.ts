@@ -17,11 +17,17 @@ export async function POST(request: Request) {
       )
     }
 
+    const origin = request.headers.get("origin") ?? ""
+    const referer = request.headers.get("referer") ?? origin
+
     const response = await fetch(`https://formsubmit.co/ajax/${CONTACT_EMAIL}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
+        "User-Agent": "PortfolioContact/1.0",
+        ...(origin ? { Origin: origin } : {}),
+        ...(referer ? { Referer: referer } : {}),
       },
       body: JSON.stringify({
         name: name.trim(),
@@ -33,16 +39,30 @@ export async function POST(request: Request) {
       cache: "no-store",
     })
 
-    const data = (await response.json()) as {
+    const raw = await response.text()
+    let data: {
       success?: string | boolean
       message?: string
+    } = {}
+
+    try {
+      data = JSON.parse(raw) as {
+        success?: string | boolean
+        message?: string
+      }
+    } catch {
+      data = {
+        message: raw.slice(0, 240),
+      }
     }
 
     if (!response.ok || (data.success !== true && data.success !== "true")) {
       return NextResponse.json(
         {
           success: false,
-          message: data.message || "Could not send message right now.",
+          message:
+            data.message ||
+            `Contact provider error (${response.status} ${response.statusText}).`,
         },
         { status: 502 }
       )
@@ -59,4 +79,3 @@ export async function POST(request: Request) {
     )
   }
 }
-

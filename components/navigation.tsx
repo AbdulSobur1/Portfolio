@@ -60,6 +60,18 @@ export function Navigation() {
     }
   }, [isMobileOpen])
 
+  // Ensure stale mobile menu state doesn't linger when resizing to desktop
+  useEffect(() => {
+    const onResize = () => {
+      if (window.innerWidth >= 768) {
+        setIsMobileOpen(false)
+      }
+    }
+
+    window.addEventListener("resize", onResize)
+    return () => window.removeEventListener("resize", onResize)
+  }, [])
+
   // Focus trap for mobile menu
   const handleMobileKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -158,6 +170,7 @@ export function Navigation() {
             aria-label={isMobileOpen ? "Close navigation menu" : "Open navigation menu"}
             aria-expanded={isMobileOpen}
             aria-controls="mobile-nav-menu"
+            aria-haspopup="dialog"
           >
             {isMobileOpen ? (
               <X className="h-5 w-5" aria-hidden="true" />
@@ -177,34 +190,53 @@ export function Navigation() {
         aria-modal={isMobileOpen ? "true" : undefined}
         onKeyDown={handleMobileKeyDown}
         className={cn(
-          "md:hidden fixed inset-0 top-16 bg-background/95 backdrop-blur-lg transition-all duration-300 z-40",
+          "md:hidden fixed inset-0 top-16 transition-all duration-300 z-40",
           isMobileOpen
             ? "opacity-100 pointer-events-auto"
             : "opacity-0 pointer-events-none"
         )}
-        {...(!isMobileOpen && { inert: "" as unknown as undefined })}
+        aria-hidden={!isMobileOpen}
       >
-        <div className="flex flex-col gap-1 p-6" role="list">
-          {navLinks.map((link) => {
-            const isActive = activeSection === link.href.slice(1)
-            return (
-              <a
-                key={link.href}
-                href={link.href}
-                role="listitem"
-                onClick={() => setIsMobileOpen(false)}
-                aria-current={isActive ? "true" : undefined}
-                className={cn(
-                  "px-4 py-3 text-lg font-medium rounded-lg transition-colors",
-                  isActive
-                    ? "text-foreground bg-muted"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                )}
-              >
-                {link.label}
-              </a>
-            )
-          })}
+        <button
+          type="button"
+          aria-label="Close navigation menu"
+          className={cn(
+            "absolute inset-0 bg-background/70 backdrop-blur-sm transition-opacity duration-300",
+            isMobileOpen ? "opacity-100" : "opacity-0"
+          )}
+          onClick={() => {
+            setIsMobileOpen(false)
+            menuButtonRef.current?.focus()
+          }}
+        />
+
+        <div
+          className={cn(
+            "relative m-4 rounded-xl border border-border bg-card/95 shadow-lg transition-all duration-300",
+            isMobileOpen ? "translate-y-0 opacity-100" : "-translate-y-3 opacity-0"
+          )}
+        >
+          <div className="flex flex-col gap-1 p-3">
+            {navLinks.map((link) => {
+              const isActive = activeSection === link.href.slice(1)
+              return (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setIsMobileOpen(false)}
+                  aria-current={isActive ? "true" : undefined}
+                  className={cn(
+                    "px-4 py-3 text-base font-medium rounded-lg transition-colors",
+                    isActive
+                      ? "text-foreground bg-muted"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                  )}
+                >
+                  {link.label}
+                </a>
+              )
+            })}
+          </div>
         </div>
       </div>
     </header>
