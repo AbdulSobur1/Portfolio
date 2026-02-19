@@ -25,7 +25,7 @@ const experiences = [
     role: "Frontend Development Foundation",
     company: "Self-Directed Training",
     period: "2022 - 2023",
-    description:
+    description: 
       "Started building production-style frontend applications using React and Next.js, with strong attention to UI consistency, responsive layouts, and accessibility basics.",
     tech: ["React", "Next.js", "TypeScript", "Tailwind CSS", "Three.js"],
     impact: "Established a full-stack workflow that led to consistent project delivery",
