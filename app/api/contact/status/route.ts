@@ -10,10 +10,6 @@ export async function GET() {
       resend: {
         configured: hasResendKey && hasResendFrom,
       },
-      formsubmitFallback: {
-        enabled: true,
-      },
     },
   })
 }
-

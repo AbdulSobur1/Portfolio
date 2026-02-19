@@ -23,7 +23,7 @@ async function sendWithResend({
   const from = process.env.RESEND_FROM
 
   if (!apiKey || !from) {
-    return { ok: false, message: "Resend env vars missing" }
+    return { ok: false as const, message: "Resend is not configured on this deployment." }
   }
 
   const response = await fetch(RESEND_API_URL, {
@@ -66,47 +66,6 @@ async function sendWithResend({
   return { ok: false as const, message: raw.slice(0, 240) }
 }
 
-async function sendWithFormSubmit({
-  name,
-  email,
-  message,
-}: {
-  name: string
-  email: string
-  message: string
-}) {
-  const response = await fetch(`https://formsubmit.co/ajax/${CONTACT_EMAIL}`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      "User-Agent": "PortfolioContact/1.0",
-    },
-    body: JSON.stringify({
-      name,
-      email,
-      message,
-      _subject: "New portfolio contact message",
-      _captcha: "false",
-    }),
-    cache: "no-store",
-  })
-
-  const raw = await response.text()
-  try {
-    const data = JSON.parse(raw) as { success?: string | boolean; message?: string }
-    if (response.ok && (data.success === true || data.success === "true")) {
-      return { ok: true as const }
-    }
-    return { ok: false as const, message: data.message || raw.slice(0, 240) }
-  } catch {
-    return {
-      ok: response.ok,
-      message: raw.slice(0, 240),
-    }
-  }
-}
-
 export async function POST(request: Request) {
   try {
     const { name, email, message } = (await request.json()) as {
@@ -131,24 +90,22 @@ export async function POST(request: Request) {
 
     const resend = await sendWithResend({ ...trimmed, referenceId })
     if (!resend.ok) {
-      const fallback = await sendWithFormSubmit(trimmed)
-      if (!fallback.ok) {
-        return NextResponse.json(
-          {
-            success: false,
-            message:
-              fallback.message || resend.message || "Contact provider unavailable.",
-          },
-          { status: 502 }
-        )
-      }
+      return NextResponse.json(
+        {
+          success: false,
+          message:
+            resend.message ||
+            "Resend delivery failed. Confirm RESEND_API_KEY and RESEND_FROM.",
+        },
+        { status: 502 }
+      )
     }
 
     return NextResponse.json({
       success: true,
       message: "The form was submitted successfully.",
       referenceId,
-      delivery: resend.ok ? "resend" : "formsubmit-fallback",
+      delivery: "resend",
     })
   } catch {
     return NextResponse.json(
