@@ -20,10 +20,10 @@ type GithubRepo = {
 async function getGithubActivity() {
   const [reposRes, eventsRes] = await Promise.all([
     fetch(`https://api.github.com/users/${GITHUB_USERNAME}/repos?per_page=6&sort=updated`, {
-      next: { revalidate: 3600 },
+      cache: "no-store",
     }),
     fetch(`https://api.github.com/users/${GITHUB_USERNAME}/events/public?per_page=6`, {
-      next: { revalidate: 900 },
+      cache: "no-store",
     }),
   ])
 

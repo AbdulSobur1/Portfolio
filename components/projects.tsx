@@ -23,7 +23,7 @@ async function getProjects(): Promise<GithubRepo[]> {
   try {
     const response = await fetch(
       `https://api.github.com/users/${GITHUB_USERNAME}/repos?per_page=100&sort=updated`,
-      { next: { revalidate: 3600 } }
+      { cache: "no-store" }
     )
 
     if (!response.ok) {
@@ -45,6 +45,17 @@ async function getProjects(): Promise<GithubRepo[]> {
   }
 }
 
+function formatProjectName(name: string) {
+  return name
+    .replace(/[-_]+/g, " ")
+    .replace(/\b\w/g, (char) => char.toUpperCase())
+}
+
+function getThumbnailUrl(project: GithubRepo) {
+  const cacheKey = encodeURIComponent(project.updated_at ?? "latest")
+  return `https://opengraph.githubassets.com/${cacheKey}/${GITHUB_USERNAME}/${project.name}`
+}
+
 export async function Projects() {
   const projects = await getProjects()
 
@@ -53,8 +64,8 @@ export async function Projects() {
       <div className="flex flex-col gap-12">
         <SectionHeader
           label="Projects"
-          heading="Projects from my GitHub."
-          description="Selected repositories from my public GitHub profile with case-study links."
+          heading="Selected client and product work."
+          description="Professional builds and product experiments, backed by live GitHub data and case studies."
         />
 
         {projects.length === 0 ? (
@@ -72,11 +83,19 @@ export async function Projects() {
                 key={project.id}
                 className="rounded-xl border border-border bg-card p-6 flex flex-col gap-4 hover:border-accent/30 transition-colors"
               >
+                <div className="overflow-hidden rounded-lg border border-border/60 bg-muted/40">
+                  <img
+                    src={getThumbnailUrl(project)}
+                    alt={`${formatProjectName(project.name)} project thumbnail`}
+                    className="h-40 w-full object-cover"
+                    loading="lazy"
+                  />
+                </div>
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <h3 className="text-lg font-semibold text-foreground break-all">
                       <Link href={`/projects/${encodeURIComponent(project.name)}`} className="hover:text-accent transition-colors">
-                        {project.name}
+                        {formatProjectName(project.name)}
                       </Link>
                     </h3>
                     <div className="mt-1 flex flex-wrap gap-1.5">
