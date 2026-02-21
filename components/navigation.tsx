@@ -191,17 +191,16 @@ export function Navigation() {
         aria-modal={isMobileOpen ? "true" : undefined}
         onKeyDown={handleMobileKeyDown}
         className={cn(
-          "md:hidden fixed inset-0 top-16 transition-all duration-300 z-40",
+          "md:hidden fixed inset-0 top-16 transition-opacity duration-300 z-40",
           isMobileOpen
             ? "opacity-100 pointer-events-auto"
             : "opacity-0 pointer-events-none"
         )}
         aria-hidden={!isMobileOpen}
       >
-        <button
-          type="button"
-          aria-label="Close navigation menu"
-          className="absolute inset-0 bg-background"
+        <div
+          role="presentation"
+          className="absolute inset-0 bg-background/80 backdrop-blur-sm"
           onClick={() => {
             setIsMobileOpen(false)
             menuButtonRef.current?.focus()
@@ -210,11 +209,11 @@ export function Navigation() {
 
         <div
           className={cn(
-            "relative h-full px-4 pt-4 pb-6",
-            isMobileOpen ? "translate-y-0 opacity-100" : "-translate-y-3 opacity-0"
+            "relative h-full px-4 pt-4 pb-6 transition-transform transition-opacity duration-300",
+            isMobileOpen ? "translate-y-0 opacity-100" : "-translate-y-2 opacity-0"
           )}
         >
-          <div className="h-full overflow-y-auto rounded-xl border border-border bg-card shadow-lg">
+          <div className="h-full overflow-y-auto rounded-2xl border border-border bg-card shadow-lg">
             <div className="flex flex-col gap-1 p-3">
               {navLinks.map((link) => {
                 const isActive = activeSection === link.href.slice(1)
