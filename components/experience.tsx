@@ -43,30 +43,27 @@ export function Experience() {
         />
 
         {/* Timeline */}
-        <ol className="relative flex flex-col gap-0" aria-label="Work experience timeline">
+        <ol className="relative flex flex-col gap-8 md:gap-0" aria-label="Work experience timeline">
           {/* Vertical line */}
-          <div className="absolute left-[7px] top-3 bottom-3 w-px bg-border md:left-[calc(theme(spacing.32)+7px)]" aria-hidden="true" />
+          <div className="absolute left-2 top-3 bottom-3 w-px bg-border md:left-[calc(theme(spacing.32)+7px)]" aria-hidden="true" />
 
           {experiences.map((exp, index) => (
             <li
               key={index}
-              className="relative flex flex-col md:flex-row gap-4 md:gap-8 pb-12 last:pb-0"
+              className="relative flex flex-col md:flex-row gap-4 md:gap-8 pb-8 md:pb-12 last:pb-0 pl-6 md:pl-0"
             >
               {/* Date column */}
               <div className="flex items-start gap-4 md:w-32 shrink-0">
                 <div className="relative z-10 mt-1.5" aria-hidden="true">
                   <div className="h-3.5 w-3.5 rounded-full border-2 border-accent bg-background" />
                 </div>
-                <span className="text-sm font-mono text-muted-foreground whitespace-nowrap md:hidden">
-                  {exp.period}
-                </span>
                 <span className="text-sm font-mono text-muted-foreground whitespace-nowrap hidden md:block absolute left-0 top-0.5">
                   {exp.period}
                 </span>
               </div>
 
               {/* Content card */}
-              <div className="ml-8 md:ml-0 flex-1 p-5 rounded-lg border border-border bg-card hover:border-accent/30 transition-colors">
+              <div className="flex-1 p-5 rounded-lg border border-border bg-card hover:border-accent/30 transition-colors">
                 <div className="flex flex-col gap-3">
                   <div>
                     <h3 className="text-base font-semibold text-foreground">
@@ -75,6 +72,9 @@ export function Experience() {
                     <p className="text-sm text-accent font-medium">
                       {exp.company}
                     </p>
+                    <span className="text-xs font-mono text-muted-foreground md:hidden">
+                      {exp.period}
+                    </span>
                     <span className="text-xs font-mono text-muted-foreground hidden md:inline">
                       {exp.period}
                     </span>
