@@ -191,7 +191,7 @@ export function Navigation() {
         aria-modal={isMobileOpen ? "true" : undefined}
         onKeyDown={handleMobileKeyDown}
         className={cn(
-          "md:hidden fixed inset-x-0 top-16 bottom-0 transition-opacity duration-300 z-50",
+          "md:hidden fixed inset-x-0 top-16 bottom-0 transition-opacity duration-300 z-50 isolate",
           isMobileOpen
             ? "opacity-100 pointer-events-auto"
             : "opacity-0 pointer-events-none"
@@ -200,7 +200,7 @@ export function Navigation() {
       >
         <div
           role="presentation"
-          className="absolute inset-0 bg-background/85 backdrop-blur-sm z-0"
+          className="absolute inset-0 bg-background/85 backdrop-blur-sm z-0 pointer-events-auto"
           onClick={() => {
             setIsMobileOpen(false)
             menuButtonRef.current?.focus()
@@ -209,7 +209,7 @@ export function Navigation() {
 
         <div
           className={cn(
-            "relative z-10 h-full px-4 pt-4 pb-6 transition-transform transition-opacity duration-300",
+            "relative z-20 h-full px-4 pt-4 pb-6 transition-transform transition-opacity duration-300 pointer-events-auto",
             isMobileOpen ? "translate-y-0 opacity-100" : "-translate-y-2 opacity-0"
           )}
         >
