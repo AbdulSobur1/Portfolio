@@ -1,10 +1,11 @@
 "use client"
 
-import { useState, useEffect, useRef, useCallback } from "react"
+import { useState, useEffect, useRef } from "react"
 import { Menu, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Button } from "@/components/ui/button"
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 
 const navLinks = [
   { label: "About", href: "#about" },
@@ -19,7 +20,6 @@ export function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileOpen, setIsMobileOpen] = useState(false)
   const [activeSection, setActiveSection] = useState("")
-  const mobileMenuRef = useRef<HTMLDivElement>(null)
   const menuButtonRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
@@ -50,17 +50,6 @@ export function Navigation() {
     return () => observer.disconnect()
   }, [])
 
-  useEffect(() => {
-    if (isMobileOpen) {
-      document.body.style.overflow = "hidden"
-    } else {
-      document.body.style.overflow = ""
-    }
-    return () => {
-      document.body.style.overflow = ""
-    }
-  }, [isMobileOpen])
-
   // Ensure stale mobile menu state doesn't linger when resizing to desktop
   useEffect(() => {
     const onResize = () => {
@@ -72,46 +61,6 @@ export function Navigation() {
     window.addEventListener("resize", onResize)
     return () => window.removeEventListener("resize", onResize)
   }, [])
-
-  // Focus trap for mobile menu
-  const handleMobileKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (!isMobileOpen) return
-
-      if (e.key === "Escape") {
-        setIsMobileOpen(false)
-        menuButtonRef.current?.focus()
-        return
-      }
-
-      if (e.key === "Tab") {
-        const focusableElements = mobileMenuRef.current?.querySelectorAll<HTMLElement>(
-          'a[href], button:not([disabled])'
-        )
-        if (!focusableElements || focusableElements.length === 0) return
-
-        const first = focusableElements[0]
-        const last = focusableElements[focusableElements.length - 1]
-
-        if (e.shiftKey && document.activeElement === first) {
-          e.preventDefault()
-          last.focus()
-        } else if (!e.shiftKey && document.activeElement === last) {
-          e.preventDefault()
-          first.focus()
-        }
-      }
-    },
-    [isMobileOpen]
-  )
-
-  // Focus first link when mobile menu opens
-  useEffect(() => {
-    if (isMobileOpen) {
-      const firstLink = mobileMenuRef.current?.querySelector<HTMLElement>("a[href]")
-      firstLink?.focus()
-    }
-  }, [isMobileOpen])
 
   return (
     <header
@@ -160,84 +109,60 @@ export function Navigation() {
         </div>
 
         {/* Mobile controls */}
-        <div className="flex md:hidden items-center gap-2">
-          <ThemeToggle />
-          <Button
-            ref={menuButtonRef}
-            variant="ghost"
-            size="icon"
-            className="h-9 w-9"
-            onClick={() => setIsMobileOpen(!isMobileOpen)}
-            aria-label={isMobileOpen ? "Close navigation menu" : "Open navigation menu"}
-            aria-expanded={isMobileOpen}
-            aria-controls="mobile-nav-menu"
-            aria-haspopup="dialog"
-          >
-            {isMobileOpen ? (
-              <X className="h-5 w-5" aria-hidden="true" />
-            ) : (
-              <Menu className="h-5 w-5" aria-hidden="true" />
-            )}
-          </Button>
-        </div>
-      </nav>
-
-      {/* Mobile menu */}
-      <div
-        id="mobile-nav-menu"
-        ref={mobileMenuRef}
-        role="dialog"
-        aria-label="Navigation menu"
-        aria-modal={isMobileOpen ? "true" : undefined}
-        onKeyDown={handleMobileKeyDown}
-        className={cn(
-          "md:hidden fixed inset-x-0 top-16 bottom-0 transition-opacity duration-300 z-50 isolate",
-          isMobileOpen
-            ? "opacity-100 pointer-events-auto"
-            : "opacity-0 pointer-events-none"
-        )}
-        aria-hidden={!isMobileOpen}
-      >
-        <div
-          role="presentation"
-          className="absolute inset-0 bg-background/85 backdrop-blur-sm z-0 pointer-events-auto"
-          onClick={() => {
-            setIsMobileOpen(false)
-            menuButtonRef.current?.focus()
-          }}
-        />
-
-        <div
-          className={cn(
-            "relative z-20 h-full px-4 pt-4 pb-6 transition-transform transition-opacity duration-300 pointer-events-auto",
-            isMobileOpen ? "translate-y-0 opacity-100" : "-translate-y-2 opacity-0"
-          )}
-        >
-          <div className="h-full overflow-y-auto rounded-2xl border border-border bg-card shadow-xl">
-            <div className="flex flex-col gap-1 p-3">
-              {navLinks.map((link) => {
-                const isActive = activeSection === link.href.slice(1)
-                return (
-                  <a
-                    key={link.href}
-                    href={link.href}
-                    onClick={() => setIsMobileOpen(false)}
-                    aria-current={isActive ? "true" : undefined}
-                    className={cn(
-                      "px-4 py-3 text-base font-medium rounded-lg transition-colors",
-                      isActive
-                        ? "text-foreground bg-muted"
-                        : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                    )}
-                  >
-                    {link.label}
-                  </a>
-                )
-              })}
-            </div>
+        <Sheet open={isMobileOpen} onOpenChange={setIsMobileOpen}>
+          <div className="flex md:hidden items-center gap-2">
+            <ThemeToggle />
+            <SheetTrigger asChild>
+              <Button
+                ref={menuButtonRef}
+                variant="ghost"
+                size="icon"
+                className="h-9 w-9"
+                aria-label={isMobileOpen ? "Close navigation menu" : "Open navigation menu"}
+                aria-expanded={isMobileOpen}
+                aria-controls="mobile-nav-menu"
+                aria-haspopup="dialog"
+              >
+                {isMobileOpen ? (
+                  <X className="h-5 w-5" aria-hidden="true" />
+                ) : (
+                  <Menu className="h-5 w-5" aria-hidden="true" />
+                )}
+              </Button>
+            </SheetTrigger>
           </div>
-        </div>
-      </div>
+
+          <SheetContent
+            id="mobile-nav-menu"
+            side="top"
+            className="mt-16 h-[calc(100vh-4rem)] w-full border-b border-border bg-card px-4 pb-6 pt-4"
+          >
+            <div className="h-full overflow-y-auto rounded-2xl border border-border bg-card">
+              <div className="flex flex-col gap-1 p-3">
+                {navLinks.map((link) => {
+                  const isActive = activeSection === link.href.slice(1)
+                  return (
+                    <a
+                      key={link.href}
+                      href={link.href}
+                      onClick={() => setIsMobileOpen(false)}
+                      aria-current={isActive ? "true" : undefined}
+                      className={cn(
+                        "px-4 py-3 text-base font-medium rounded-lg transition-colors",
+                        isActive
+                          ? "text-foreground bg-muted"
+                          : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                      )}
+                    >
+                      {link.label}
+                    </a>
+                  )
+                })}
+              </div>
+            </div>
+          </SheetContent>
+        </Sheet>
+      </nav>
     </header>
   )
 }
