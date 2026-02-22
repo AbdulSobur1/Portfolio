@@ -21,21 +21,57 @@ type GithubRepo = {
 async function getRepo(slug: string): Promise<GithubRepo | null> {
   const response = await fetch(
     `https://api.github.com/repos/${GITHUB_USERNAME}/${slug}`,
-    { next: { revalidate: 1800 } }
+    { cache: "no-store" }
   )
   if (!response.ok) return null
   return (await response.json()) as GithubRepo
 }
 
+type GithubReadme = {
+  content?: string
+  encoding?: string
+}
+
+function extractSummaryFromReadme(raw: string) {
+  const text = raw
+    .replace(/```[\s\S]*?```/g, "")
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, "")
+    .replace(/\[[^\]]*\]\([^)]*\)/g, "$1")
+    .replace(/^#{1,6}\s+/gm, "")
+    .replace(/^\s*[-*+]\s+/gm, "")
+    .replace(/\r/g, "")
+    .trim()
+
+  const firstParagraph = text.split(/\n\s*\n/)[0]?.trim()
+  if (!firstParagraph) return null
+  return firstParagraph.length > 220 ? `${firstParagraph.slice(0, 217)}...` : firstParagraph
+}
+
+async function getReadmeSummary(slug: string): Promise<string | null> {
+  const response = await fetch(
+    `https://api.github.com/repos/${GITHUB_USERNAME}/${slug}/readme`,
+    { cache: "no-store" }
+  )
+  if (!response.ok) return null
+  const readme = (await response.json()) as GithubReadme
+  if (!readme.content || readme.encoding !== "base64") return null
+  const raw = Buffer.from(readme.content, "base64").toString("utf-8")
+  return extractSummaryFromReadme(raw)
+}
+
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
-  const repo = await getRepo(params.slug)
+  const [repo, readmeSummary] = await Promise.all([
+    getRepo(params.slug),
+    getReadmeSummary(params.slug),
+  ])
   if (!repo) return {}
+  const description = readmeSummary ?? repo.description ?? `Case study for ${repo.name}`
   return {
     title: `${repo.name} Case Study | SoburrX`,
-    description: repo.description ?? `Case study for ${repo.name}`,
+    description,
     openGraph: {
       title: `${repo.name} Case Study`,
-      description: repo.description ?? `Case study for ${repo.name}`,
+      description,
       type: "article",
       url: `${SITE_URL}/projects/${repo.name}`,
     },
@@ -43,11 +79,18 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
 }
 
 export default async function ProjectCaseStudyPage({ params }: { params: Params }) {
-  const repo = await getRepo(params.slug)
+  const [repo, readmeSummary] = await Promise.all([
+    getRepo(params.slug),
+    getReadmeSummary(params.slug),
+  ])
   if (!repo) notFound()
 
   const status = repo.archived ? "Archived" : repo.homepage ? "Live" : "Code only"
   const screenshotUrl = `https://opengraph.githubassets.com/1/${GITHUB_USERNAME}/${repo.name}`
+  const overview =
+    readmeSummary ??
+    repo.description ??
+    "This project showcases practical full-stack engineering decisions and delivery."
 
   return (
     <main className="min-h-screen px-4 md:px-6 lg:px-8 py-24">
@@ -65,9 +108,7 @@ export default async function ProjectCaseStudyPage({ params }: { params: Params 
         </div>
 
         <h1 className="text-3xl md:text-4xl font-semibold text-foreground mt-4">{repo.name}</h1>
-        <p className="text-muted-foreground mt-3 leading-relaxed">
-          {repo.description ?? "This project showcases practical full-stack engineering decisions and delivery."}
-        </p>
+        <p className="text-muted-foreground mt-3 leading-relaxed">{overview}</p>
 
         <div className="mt-6 overflow-hidden rounded-xl border border-border bg-muted/20">
           <img
@@ -97,9 +138,9 @@ export default async function ProjectCaseStudyPage({ params }: { params: Params 
 
         <section className="mt-10 space-y-6">
           <div>
-            <h2 className="text-xl font-semibold text-foreground">Problem</h2>
+            <h2 className="text-xl font-semibold text-foreground">Overview</h2>
             <p className="text-muted-foreground mt-2 leading-relaxed">
-              Build a reliable and maintainable project that solves a concrete product need while staying easy to iterate on.
+              {overview}
             </p>
           </div>
           <div>
