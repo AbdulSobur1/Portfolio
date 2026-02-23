@@ -11,6 +11,7 @@ type GithubRepo = {
   html_url: string
   homepage: string | null
   description: string | null
+  readmeSummary?: string | null
   language: string | null
   stargazers_count: number
   forks_count: number
@@ -19,11 +20,53 @@ type GithubRepo = {
   archived?: boolean
 }
 
+type GithubReadme = {
+  content?: string
+  encoding?: string
+}
+
+function extractSummaryFromReadme(raw: string) {
+  const text = raw
+    .replace(/```[\s\S]*?```/g, "")
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, "")
+    .replace(/\[[^\]]*\]\([^)]*\)/g, "$1")
+    .replace(/^#{1,6}\s+/gm, "")
+    .replace(/^\s*[-*+]\s+/gm, "")
+    .replace(/\r/g, "")
+    .trim()
+
+  const firstParagraph = text.split(/\n\s*\n/)[0]?.trim()
+  if (!firstParagraph) return null
+  return firstParagraph.length > 160 ? `${firstParagraph.slice(0, 157)}...` : firstParagraph
+}
+
+async function getReadmeSummary(repo: GithubRepo): Promise<string | null> {
+  const headers: Record<string, string> = {}
+  if (process.env.GITHUB_TOKEN) {
+    headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`
+  }
+
+  const response = await fetch(
+    `https://api.github.com/repos/${GITHUB_USERNAME}/${repo.name}/readme`,
+    { cache: "no-store", headers }
+  )
+  if (!response.ok) return null
+  const readme = (await response.json()) as GithubReadme
+  if (!readme.content || readme.encoding !== "base64") return null
+  const raw = Buffer.from(readme.content, "base64").toString("utf-8")
+  return extractSummaryFromReadme(raw)
+}
+
 async function getProjects(): Promise<GithubRepo[]> {
   try {
+    const headers: Record<string, string> = {}
+    if (process.env.GITHUB_TOKEN) {
+      headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`
+    }
+
     const response = await fetch(
       `https://api.github.com/users/${GITHUB_USERNAME}/repos?per_page=100&sort=updated`,
-      { cache: "no-store" }
+      { cache: "no-store", headers }
     )
 
     if (!response.ok) {
@@ -31,7 +74,7 @@ async function getProjects(): Promise<GithubRepo[]> {
     }
 
     const repos = (await response.json()) as GithubRepo[]
-    return repos
+    const topRepos = repos
       .filter((repo) => !repo.fork)
       .sort((a, b) => {
         if (b.stargazers_count !== a.stargazers_count) {
@@ -40,6 +83,15 @@ async function getProjects(): Promise<GithubRepo[]> {
         return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
       })
       .slice(0, 8)
+
+    const withSummaries = await Promise.all(
+      topRepos.map(async (repo) => ({
+        ...repo,
+        readmeSummary: await getReadmeSummary(repo),
+      }))
+    )
+
+    return withSummaries
   } catch {
     return []
   }
@@ -126,7 +178,7 @@ export async function Projects() {
                 </div>
 
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  {project.description ?? "No description provided."}
+                  {project.readmeSummary ?? project.description ?? "No description provided."}
                 </p>
 
                 <div className="flex items-center gap-4 text-xs text-muted-foreground">

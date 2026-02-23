@@ -1,7 +1,8 @@
 import type { Metadata } from "next"
 import Link from "next/link"
-import { notFound } from "next/navigation"
 import { GITHUB_USERNAME, SITE_URL } from "@/lib/constants"
+
+export const dynamic = "force-dynamic"
 
 type Params = { slug: string }
 
@@ -19,9 +20,14 @@ type GithubRepo = {
 }
 
 async function getRepo(slug: string): Promise<GithubRepo | null> {
+  const headers: Record<string, string> = {}
+  if (process.env.GITHUB_TOKEN) {
+    headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`
+  }
+
   const response = await fetch(
     `https://api.github.com/repos/${GITHUB_USERNAME}/${slug}`,
-    { cache: "no-store" }
+    { cache: "no-store", headers }
   )
   if (!response.ok) return null
   return (await response.json()) as GithubRepo
@@ -48,9 +54,14 @@ function extractSummaryFromReadme(raw: string) {
 }
 
 async function getReadmeSummary(slug: string): Promise<string | null> {
+  const headers: Record<string, string> = {}
+  if (process.env.GITHUB_TOKEN) {
+    headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`
+  }
+
   const response = await fetch(
     `https://api.github.com/repos/${GITHUB_USERNAME}/${slug}/readme`,
-    { cache: "no-store" }
+    { cache: "no-store", headers }
   )
   if (!response.ok) return null
   const readme = (await response.json()) as GithubReadme
@@ -83,7 +94,27 @@ export default async function ProjectCaseStudyPage({ params }: { params: Params 
     getRepo(params.slug),
     getReadmeSummary(params.slug),
   ])
-  if (!repo) notFound()
+  if (!repo) {
+    return (
+      <main className="min-h-screen px-4 md:px-6 lg:px-8 py-24">
+        <article className="mx-auto max-w-3xl rounded-xl border border-border bg-card p-6 md:p-8">
+          <Link href="/#projects" className="text-sm text-accent hover:underline">
+            ← Back to projects
+          </Link>
+          <h1 className="text-2xl md:text-3xl font-semibold text-foreground mt-4">
+            Case study unavailable
+          </h1>
+          <p className="text-muted-foreground mt-3 leading-relaxed">
+            GitHub didn’t return data for this repository. This can happen if the repo is
+            private, the API is rate-limited, or the name changed.
+          </p>
+          <div className="mt-6 rounded-lg border border-border bg-muted/30 p-4 text-sm text-muted-foreground">
+            Repo: {GITHUB_USERNAME}/{params.slug}
+          </div>
+        </article>
+      </main>
+    )
+  }
 
   const status = repo.archived ? "Archived" : repo.homepage ? "Live" : "Code only"
   const screenshotUrl = `https://opengraph.githubassets.com/1/${GITHUB_USERNAME}/${repo.name}`
