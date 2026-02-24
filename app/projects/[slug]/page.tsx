@@ -198,7 +198,7 @@ export default async function ProjectCaseStudyPage({ params }: { params: Params 
         <div className="mt-6 overflow-hidden rounded-xl border border-border bg-muted/20">
           <img
             src={screenshotUrl}
-            alt={`${repo.name} repository preview`}
+            alt={`${repo.repo.name} repository preview`}
             className="w-full h-auto"
             loading="lazy"
           />
