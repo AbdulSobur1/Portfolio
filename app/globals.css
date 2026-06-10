@@ -10,30 +10,30 @@
 
 @layer base {
   :root {
-    --background: 0 0% 98%;
-    --foreground: 0 0% 7%;
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 7%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 7%;
-    --primary: 0 0% 7%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 94%;
-    --secondary-foreground: 0 0% 7%;
-    --muted: 0 0% 94%;
-    --muted-foreground: 0 0% 40%;
+    --background: 210 10% 5%;
+    --foreground: 210 10% 95%;
+    --card: 210 10% 7%;
+    --card-foreground: 210 10% 95%;
+    --popover: 210 10% 7%;
+    --popover-foreground: 210 10% 95%;
+    --primary: 210 10% 95%;
+    --primary-foreground: 210 10% 5%;
+    --secondary: 210 8% 12%;
+    --secondary-foreground: 210 10% 95%;
+    --muted: 210 8% 14%;
+    --muted-foreground: 210 6% 55%;
     --accent: 160 84% 39%;
     --accent-foreground: 0 0% 100%;
-    --destructive: 0 84.2% 60.2%;
+    --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 90%;
-    --input: 0 0% 90%;
+    --border: 210 8% 15%;
+    --input: 210 8% 15%;
     --ring: 160 84% 39%;
     --chart-1: 160 84% 39%;
     --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
     --radius: 0.625rem;
   }
   .dark {
@@ -73,6 +73,21 @@
   }
   html {
     scroll-behavior: smooth;
+  }
+}
+
+@layer utilities {
+  .fade-in-up {
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .fade-in-up.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .glow-text {
+    text-shadow: 0 0 20px rgba(110, 231, 183, 0.4);
   }
 }
 

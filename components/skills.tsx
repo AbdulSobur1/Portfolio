@@ -1,76 +1,86 @@
-import { SectionWrapper } from "@/components/section-wrapper"
-import { SectionHeader } from "@/components/section-header"
-import { Badge } from "@/components/ui/badge"
+"use client"
 
-const skillCategories = [
+import { SectionWrapper } from "@/components/section-wrapper"
+import { ShimmerText } from "@/components/ui/shimmer-text"
+import { FeatureSection } from "@/components/ui/feature-section"
+
+const skillData = {
+  frontend: [
+    "React", "Next.js", "TypeScript", "Tailwind CSS", "Three.js",
+    "HTML/CSS", "JavaScript ES6+", "Responsive Design", "Accessibility",
+  ],
+  backend: [
+    "Node.js", "Python", "GraphQL", "REST APIs", "WebSockets",
+    "Microservices", "Docker", "CI/CD", "Serverless",
+  ],
+  databases: [
+    "PostgreSQL", "MongoDB", "DynamoDB", "Neon", "Prisma", "Drizzle", "Supabase",
+  ],
+}
+
+const steps = [
   {
-    name: "Frontend",
-    skills: [
-      "React",
-      "Next.js",
-      "TypeScript",
-      "Tailwind CSS",
-      "Three.js",
-    ],
+    label: "Frontend",
+    content: (
+      <div className="flex flex-wrap gap-2">
+        {skillData.frontend.map((skill) => (
+          <span
+            key={skill}
+            className="px-3 py-1.5 text-sm font-mono rounded-full bg-white/5 border border-white/10 text-slate-300 hover:border-emerald-300/40 hover:text-emerald-300 transition-colors cursor-default"
+          >
+            {skill}
+          </span>
+        ))}
+      </div>
+    ),
   },
   {
-    name: "Backend",
-    skills: [
-      "Node.js",
-      "Python",
-      "GraphQL",
-      "REST APIs",
-      "WebSockets",
-      "Microservices",
-    ],
+    label: "Backend",
+    content: (
+      <div className="flex flex-wrap gap-2">
+        {skillData.backend.map((skill) => (
+          <span
+            key={skill}
+            className="px-3 py-1.5 text-sm font-mono rounded-full bg-white/5 border border-white/10 text-slate-300 hover:border-emerald-300/40 hover:text-emerald-300 transition-colors cursor-default"
+          >
+            {skill}
+          </span>
+        ))}
+      </div>
+    ),
   },
   {
-    name: "Databases",
-    skills: [
-      "PostgreSQL",
-      "MongoDB",
-      "DynamoDB",
-      "Neon",
-      "Prisma",
-      "Drizzle",
-      "Supabase",
-    ],
+    label: "Databases",
+    content: (
+      <div className="flex flex-wrap gap-2">
+        {skillData.databases.map((skill) => (
+          <span
+            key={skill}
+            className="px-3 py-1.5 text-sm font-mono rounded-full bg-white/5 border border-white/10 text-slate-300 hover:border-emerald-300/40 hover:text-emerald-300 transition-colors cursor-default"
+          >
+            {skill}
+          </span>
+        ))}
+      </div>
+    ),
   },
 ]
 
 export function Skills() {
   return (
     <SectionWrapper id="skills">
-      <div className="flex flex-col gap-12">
-        <SectionHeader
-          label="Skills"
-          heading="Core technologies I use to ship projects."
-          description="My current stack across frontend, backend, and databases."
-        />
+      <div className="flex flex-col gap-8">
+        <div className="flex flex-col gap-2 max-w-2xl">
+          <span className="text-xs font-mono font-medium text-emerald-300 tracking-widest uppercase">
+            SKILLS
+          </span>
+          <h2 className="text-3xl md:text-4xl font-semibold tracking-tight text-white text-balance">
+            Core technologies I <ShimmerText className="text-emerald-300">ship</ShimmerText> with.
+          </h2>
+        </div>
 
-        {/* Skills grid */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {skillCategories.map((category) => (
-            <div
-              key={category.name}
-              className="flex flex-col gap-4 p-6 rounded-lg border border-border bg-card"
-            >
-              <h3 className="text-sm font-semibold text-foreground uppercase tracking-wider">
-                {category.name}
-              </h3>
-              <div className="flex flex-wrap gap-2">
-                {category.skills.map((skill) => (
-                  <Badge
-                    key={skill}
-                    variant="secondary"
-                    className="bg-secondary text-secondary-foreground hover:bg-accent/10 hover:text-accent transition-colors cursor-default font-medium"
-                  >
-                    {skill}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-          ))}
+        <div className="rounded-xl border border-[#1e2530] bg-[#12161a] p-6 md:p-8">
+          <FeatureSection steps={steps} autoAdvanceInterval={3000} />
         </div>
       </div>
     </SectionWrapper>

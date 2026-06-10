@@ -1,15 +1,19 @@
 "use client"
 
 import { useState } from "react"
-import { Calendar, Send } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { Calendar, Send, Github, Linkedin, Twitter } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { SectionWrapper } from "@/components/section-wrapper"
-import { SectionHeader } from "@/components/section-header"
 import { FormField } from "@/components/form-field"
-import { SOCIAL_LINKS } from "@/lib/constants"
+import { HoverButton } from "@/components/ui/hover-button"
 import { CONTACT_EMAIL, SCHEDULING_URL } from "@/lib/constants"
+
+const socialLinks = [
+  { icon: Github, label: "GitHub", href: "https://github.com/AbdulSobur1" },
+  { icon: Linkedin, label: "LinkedIn", href: "https://www.linkedin.com/in/sobur1/" },
+  { icon: Twitter, label: "X / Twitter", href: "https://x.com/soburr0" },
+]
 
 export function Contact() {
   const [formData, setFormData] = useState({
@@ -50,9 +54,7 @@ export function Contact() {
     try {
       const response = await fetch("/api/contact", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: formData.name,
           email: formData.email,
@@ -96,29 +98,34 @@ export function Contact() {
       <div className="grid md:grid-cols-2 gap-12 lg:gap-16">
         {/* Left column */}
         <div className="flex flex-col gap-6">
-          <SectionHeader
-            label="Contact"
-            heading="Let's build something great."
-            description="Whether you have a project in mind, need a technical co-founder, or just want to chat about engineering — I'd love to hear from you."
-          />
-          <Button variant="outline" className="w-fit gap-2" asChild>
-            <a href={SCHEDULING_URL} target="_blank" rel="noopener noreferrer">
-              Book Intro Call
-              <Calendar className="h-4 w-4" />
-            </a>
-          </Button>
+          <div className="flex flex-col gap-2">
+            <span className="text-xs font-mono font-medium text-emerald-300 tracking-widest uppercase">
+              CONTACT
+            </span>
+            <h2 className="text-3xl md:text-4xl font-semibold tracking-tight text-white text-balance">
+              Let&apos;s build something great.
+            </h2>
+            <p className="text-slate-400 leading-relaxed mt-2">
+              Whether you have a project in mind, need a technical co-founder, or just want to chat about engineering — I&apos;d love to hear from you.
+            </p>
+          </div>
+
+          <HoverButton href={SCHEDULING_URL} className="w-fit">
+            Book Intro Call
+            <Calendar className="ml-2 h-4 w-4" />
+          </HoverButton>
 
           {/* Social links */}
           <nav aria-label="Social media links" className="flex flex-col gap-3 pt-4">
-            {SOCIAL_LINKS.map((social) => (
+            {socialLinks.map((social) => (
               <a
                 key={social.label}
                 href={social.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors"
+                className="group flex items-center gap-3 text-slate-400 hover:text-white transition-colors"
               >
-                <div className="flex items-center justify-center h-10 w-10 rounded-lg border border-border group-hover:border-accent/30 group-hover:bg-accent/5 transition-all">
+                <div className="flex items-center justify-center h-10 w-10 rounded-lg border border-[#1e2530] bg-[#12161a] group-hover:border-emerald-300/30 group-hover:bg-emerald-300/5 transition-all">
                   <social.icon className="h-4 w-4" aria-hidden="true" />
                 </div>
                 <span className="text-sm font-medium">{social.label}</span>
@@ -133,36 +140,36 @@ export function Contact() {
             <div
               role="status"
               aria-live="polite"
-              className="flex flex-col items-center justify-center gap-4 p-8 rounded-xl border border-border bg-card text-center h-full"
+              className="flex flex-col items-center justify-center gap-4 p-8 rounded-xl border border-[#1e2530] bg-[#12161a] text-center h-full"
             >
-              <div className="h-12 w-12 rounded-full bg-accent/10 flex items-center justify-center">
-                <Send className="h-5 w-5 text-accent" aria-hidden="true" />
+              <div className="h-12 w-12 rounded-full bg-emerald-300/10 flex items-center justify-center">
+                <Send className="h-5 w-5 text-emerald-300" aria-hidden="true" />
               </div>
               <div className="flex flex-col gap-1">
-                <h3 className="text-lg font-semibold text-foreground">
+                <h3 className="text-lg font-semibold text-white">
                   Message sent!
                 </h3>
-                <p className="text-sm text-muted-foreground">
-                  {"Thanks for reaching out. I'll get back to you within 24 hours."}
+                <p className="text-sm text-slate-400">
+                  Thanks for reaching out. I&apos;ll get back to you within 24 hours.
                 </p>
                 {referenceId ? (
-                  <p className="text-xs text-accent font-mono">Reference ID: {referenceId}</p>
+                  <p className="text-xs text-emerald-300 font-mono">Reference ID: {referenceId}</p>
                 ) : null}
               </div>
-              <Button
-                variant="outline"
+              <button
                 onClick={() => {
                   setSubmitted(false)
                   setFormData({ name: "", email: "", message: "" })
                 }}
+                className="text-sm text-emerald-300 hover:underline"
               >
                 Send another message
-              </Button>
+              </button>
             </div>
           ) : (
             <form
               onSubmit={handleSubmit}
-              className="flex flex-col gap-5 p-6 md:p-8 rounded-xl border border-border bg-card"
+              className="flex flex-col gap-5 p-6 md:p-8 rounded-xl border border-[#1e2530] bg-[#12161a]"
               noValidate
             >
               <FormField label="Name" htmlFor="name" error={errors.name} required>
@@ -176,11 +183,7 @@ export function Contact() {
                   required
                   aria-invalid={!!errors.name}
                   aria-describedby={errors.name ? "name-error" : undefined}
-                  className={
-                    errors.name
-                      ? "border-destructive focus-visible:ring-destructive"
-                      : ""
-                  }
+                  className="bg-white/5 border-white/10 focus:border-emerald-300/50 text-white placeholder:text-slate-500"
                 />
               </FormField>
 
@@ -196,11 +199,7 @@ export function Contact() {
                   required
                   aria-invalid={!!errors.email}
                   aria-describedby={errors.email ? "email-error" : undefined}
-                  className={
-                    errors.email
-                      ? "border-destructive focus-visible:ring-destructive"
-                      : ""
-                  }
+                  className="bg-white/5 border-white/10 focus:border-emerald-300/50 text-white placeholder:text-slate-500"
                 />
               </FormField>
 
@@ -216,34 +215,26 @@ export function Contact() {
                   required
                   aria-invalid={!!errors.message}
                   aria-describedby={errors.message ? "message-error" : undefined}
-                  className={`resize-none ${
-                    errors.message
-                      ? "border-destructive focus-visible:ring-destructive"
-                      : ""
-                  }`}
+                  className="bg-white/5 border-white/10 focus:border-emerald-300/50 text-white placeholder:text-slate-500 resize-none"
                 />
               </FormField>
 
               {submitError ? (
-                <div role="alert" className="text-sm text-destructive flex flex-col gap-2">
+                <div role="alert" className="text-sm text-red-400 flex flex-col gap-2">
                   <p>{submitError}</p>
                   <a
                     href={`mailto:${CONTACT_EMAIL}`}
-                    className="text-accent hover:underline"
+                    className="text-emerald-300 hover:underline"
                   >
                     Or email me directly at {CONTACT_EMAIL}
                   </a>
                 </div>
               ) : null}
 
-              <Button
-                type="submit"
-                className="bg-accent text-accent-foreground hover:bg-accent/90 gap-2"
-                disabled={isSubmitting}
-              >
+              <HoverButton type="submit" className="w-full" disabled={isSubmitting}>
                 <Send className="h-4 w-4" aria-hidden="true" />
                 {isSubmitting ? "Sending..." : "Send Message"}
-              </Button>
+              </HoverButton>
             </form>
           )}
         </div>

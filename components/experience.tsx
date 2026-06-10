@@ -1,6 +1,7 @@
+"use client"
+
 import { SectionWrapper } from "@/components/section-wrapper"
-import { SectionHeader } from "@/components/section-header"
-import { Badge } from "@/components/ui/badge"
+import { useScrollReveal } from "@/hooks/use-scroll-reveal"
 
 const experiences = [
   {
@@ -10,7 +11,6 @@ const experiences = [
     description:
       "Building and shipping full-stack applications with Next.js, TypeScript, Node.js, and modern databases. Focused on clean architecture, reliable APIs, and responsive UI.",
     tech: ["Next.js", "TypeScript", "Node.js", "PostgreSQL", "Prisma", "Tailwind CSS"],
-    impact: "Shipped 8 projects and improved delivery speed through reusable components",
   },
   {
     role: "Backend Development Practice",
@@ -19,88 +19,83 @@ const experiences = [
     description:
       "Designed backend services with REST APIs and GraphQL, added realtime features with WebSockets, and practiced service separation using microservice-style patterns.",
     tech: ["Node.js", "Python", "GraphQL", "REST APIs", "WebSockets", "MongoDB"],
-    impact: "Built multiple backend-driven projects with authentication and data workflows",
   },
   {
     role: "Frontend Development Foundation",
     company: "Self-Directed Training",
     period: "2022 - 2023",
-    description: 
+    description:
       "Started building production-style frontend applications using React and Next.js, with strong attention to UI consistency, responsive layouts, and accessibility basics.",
     tech: ["React", "Next.js", "TypeScript", "Tailwind CSS", "Three.js"],
-    impact: "Established a full-stack workflow that led to consistent project delivery",
   },
 ]
 
 export function Experience() {
+  const ref = useScrollReveal()
+
   return (
     <SectionWrapper id="experience">
-      <div className="flex flex-col gap-12">
-        <SectionHeader
-          label="Experience"
-          heading="3 years of practical full-stack growth."
-          description="My journey from frontend foundations to shipping full-stack applications as a junior engineer."
-        />
+      <div ref={ref} className="flex flex-col gap-8">
+        <div className="flex flex-col gap-2 max-w-2xl">
+          <span className="text-xs font-mono font-medium text-emerald-300 tracking-widest uppercase">
+            EXPERIENCE
+          </span>
+          <h2 className="text-3xl md:text-4xl font-semibold tracking-tight text-white text-balance">
+            3 years of practical full-stack growth.
+          </h2>
+          <p className="text-slate-400 leading-relaxed mt-2">
+            My journey from frontend foundations to shipping full-stack applications as a junior engineer.
+          </p>
+        </div>
 
         {/* Timeline */}
-        <ol className="relative flex flex-col gap-8 md:gap-0" aria-label="Work experience timeline">
+        <div className="relative">
           {/* Vertical line */}
-          <div className="absolute left-2 top-3 bottom-3 w-px bg-border md:left-[calc(theme(spacing.32)+7px)]" aria-hidden="true" />
+          <div className="absolute left-[11px] top-2 bottom-2 w-px bg-emerald-300/20" aria-hidden="true" />
 
-          {experiences.map((exp, index) => (
-            <li
-              key={index}
-              className="relative flex flex-col md:flex-row gap-4 md:gap-8 pb-8 md:pb-12 last:pb-0 pl-6 md:pl-0"
-            >
-              {/* Date column */}
-              <div className="flex items-start gap-4 md:w-32 shrink-0">
-                <div className="relative z-10 mt-1.5" aria-hidden="true">
-                  <div className="h-3.5 w-3.5 rounded-full border-2 border-accent bg-background" />
+          <div className="flex flex-col gap-8">
+            {experiences.map((exp, index) => (
+              <div
+                key={index}
+                className="fade-in-up relative pl-8 group"
+                style={{ transitionDelay: `${index * 0.15}s` }}
+              >
+                {/* Timeline dot */}
+                <div className="absolute left-0 top-1.5 z-10 h-6 w-6 rounded-full border-2 border-emerald-300 bg-[#0d0f11] flex items-center justify-center group-hover:bg-emerald-300/20 transition-colors">
+                  <div className="h-2 w-2 rounded-full bg-emerald-300" />
                 </div>
-                <span className="text-sm font-mono text-muted-foreground whitespace-nowrap hidden md:block absolute left-0 top-0.5">
+
+                {/* Date */}
+                <span className="text-xs font-mono text-emerald-300/60 mb-2 block">
                   {exp.period}
                 </span>
-              </div>
 
-              {/* Content card */}
-              <div className="flex-1 p-5 rounded-lg border border-border bg-card hover:border-accent/30 transition-colors">
-                <div className="flex flex-col gap-3">
-                  <div>
-                    <h3 className="text-base font-semibold text-foreground">
-                      {exp.role}
-                    </h3>
-                    <p className="text-sm text-accent font-medium">
-                      {exp.company}
-                    </p>
-                    <span className="text-xs font-mono text-muted-foreground md:hidden">
-                      {exp.period}
-                    </span>
-                    <span className="text-xs font-mono text-muted-foreground hidden md:inline">
-                      {exp.period}
-                    </span>
-                  </div>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    {exp.description}
+                {/* Content card */}
+                <div className="rounded-xl border border-[#1e2530] bg-[#12161a] p-5 hover:border-emerald-300/20 transition-all duration-300">
+                  <h3 className="text-base font-bold text-white">
+                    {exp.role}
+                  </h3>
+                  <p className="text-sm text-emerald-300 font-medium mb-3">
+                    {exp.company}
                   </p>
-                  <p className="text-sm font-medium text-foreground">
-                    {exp.impact}
+                  <p className="text-sm text-slate-400 leading-relaxed mb-4">
+                    {exp.description}
                   </p>
                   <div className="flex flex-wrap gap-1.5">
                     {exp.tech.map((t) => (
-                      <Badge
+                      <span
                         key={t}
-                        variant="secondary"
-                        className="text-xs bg-secondary text-secondary-foreground"
+                        className="px-2 py-0.5 text-[11px] font-mono rounded-full bg-white/5 border border-white/10 text-slate-400"
                       >
                         {t}
-                      </Badge>
+                      </span>
                     ))}
                   </div>
                 </div>
               </div>
-            </li>
-          ))}
-        </ol>
+            ))}
+          </div>
+        </div>
       </div>
     </SectionWrapper>
   )

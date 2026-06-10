@@ -1,8 +1,9 @@
-import { ExternalLink, Github, Star, GitFork } from "lucide-react"
+"use client"
+
+import { ExternalLink, Github, Star } from "lucide-react"
 import Link from "next/link"
-import { Badge } from "@/components/ui/badge"
 import { SectionWrapper } from "@/components/section-wrapper"
-import { SectionHeader } from "@/components/section-header"
+import { useScrollReveal } from "@/hooks/use-scroll-reveal"
 import { GITHUB_USERNAME } from "@/lib/constants"
 
 type GithubRepo = {
@@ -11,51 +12,68 @@ type GithubRepo = {
   html_url: string
   homepage: string | null
   description: string | null
-  readmeSummary?: string | null
+  readme_summary?: string | null
   language: string | null
   stargazers_count: number
-  forks_count: number
   updated_at: string
   fork: boolean
-  archived?: boolean
 }
 
-type GithubReadme = {
-  content?: string
-  encoding?: string
+interface StaticProject {
+  id: number
+  name: string
+  html_url: string
+  homepage: string | null
+  description: string | null
+  language: string
+  stargazers_count: number
+  topics: string[]
 }
 
-function extractSummaryFromReadme(raw: string) {
-  const text = raw
-    .replace(/```[\s\S]*?```/g, "")
-    .replace(/!\[[^\]]*\]\([^)]*\)/g, "")
-    .replace(/\[[^\]]*\]\([^)]*\)/g, "$1")
-    .replace(/^#{1,6}\s+/gm, "")
-    .replace(/^\s*[-*+]\s+/gm, "")
-    .replace(/\r/g, "")
-    .trim()
+type DisplayProject = GithubRepo | StaticProject
 
-  const firstParagraph = text.split(/\n\s*\n/)[0]?.trim()
-  if (!firstParagraph) return null
-  return firstParagraph.length > 160 ? `${firstParagraph.slice(0, 157)}...` : firstParagraph
-}
-
-async function getReadmeSummary(repo: GithubRepo): Promise<string | null> {
-  const headers: Record<string, string> = {}
-  if (process.env.GITHUB_TOKEN) {
-    headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`
-  }
-
-  const response = await fetch(
-    `https://api.github.com/repos/${GITHUB_USERNAME}/${repo.name}/readme`,
-    { cache: "no-store", headers }
-  )
-  if (!response.ok) return null
-  const readme = (await response.json()) as GithubReadme
-  if (!readme.content || readme.encoding !== "base64") return null
-  const raw = Buffer.from(readme.content, "base64").toString("utf-8")
-  return extractSummaryFromReadme(raw)
-}
+const STATIC_PROJECTS = [
+  {
+    id: 1,
+    name: "UmmahConnect",
+    html_url: "https://github.com/AbdulSobur1/UmmahConnect",
+    homepage: null,
+    description: "A community platform for Muslim communities to connect, share events, and manage resources.",
+    language: "TypeScript",
+    stargazers_count: 0,
+    topics: ["Next.js", "PostgreSQL", "Tailwind"],
+  },
+  {
+    id: 2,
+    name: "MedCore",
+    html_url: "https://github.com/AbdulSobur1/MedCore",
+    homepage: null,
+    description: "Healthcare management system with patient records, appointments, and analytics dashboard.",
+    language: "TypeScript",
+    stargazers_count: 0,
+    topics: ["React", "Node.js", "PostgreSQL"],
+  },
+  {
+    id: 3,
+    name: "Portfolio",
+    html_url: "https://github.com/AbdulSobur1/Portfolio",
+    homepage: "https://portfolio-lyart-alpha-11.vercel.app",
+    description: "Personal portfolio site built with Next.js, shadcn/ui, and modern design patterns.",
+    language: "TypeScript",
+    stargazers_count: 0,
+    topics: ["Next.js", "shadcn/ui", "Tailwind"],
+  },
+  {
+    id: 4,
+    name: "NexaChat",
+    html_url: "https://github.com/AbdulSobur1/NexaChat",
+    homepage: null,
+    description: "Real-time chat application with WebSocket support and modern UI.",
+    language: "TypeScript",
+    stargazers_count: 0,
+    topics: ["React", "WebSockets", "Node.js"],
+  },
+]
 
 async function getProjects(): Promise<GithubRepo[]> {
   try {
@@ -74,7 +92,7 @@ async function getProjects(): Promise<GithubRepo[]> {
     }
 
     const repos = (await response.json()) as GithubRepo[]
-    const topRepos = repos
+    return repos
       .filter((repo) => !repo.fork)
       .sort((a, b) => {
         if (b.stargazers_count !== a.stargazers_count) {
@@ -83,15 +101,6 @@ async function getProjects(): Promise<GithubRepo[]> {
         return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
       })
       .slice(0, 8)
-
-    const withSummaries = await Promise.all(
-      topRepos.map(async (repo) => ({
-        ...repo,
-        readmeSummary: await getReadmeSummary(repo),
-      }))
-    )
-
-    return withSummaries
   } catch {
     return []
   }
@@ -103,124 +112,110 @@ function formatProjectName(name: string) {
     .replace(/\b\w/g, (char) => char.toUpperCase())
 }
 
-function getThumbnailUrl(project: GithubRepo) {
-  const cacheKey = encodeURIComponent(project.updated_at ?? "latest")
-  return `https://opengraph.githubassets.com/${cacheKey}/${GITHUB_USERNAME}/${project.name}`
+function ProjectsGrid({ projects }: { projects: DisplayProject[] }) {
+  const ref = useScrollReveal()
+
+  return (
+    <div ref={ref} className="grid md:grid-cols-2 gap-5">
+      {projects.map((project, index) => (
+        <article
+          key={project.id}
+          className="fade-in-up group rounded-xl border border-[#1e2530] bg-[#12161a] p-6 flex flex-col gap-4 hover:border-emerald-300/20 transition-all duration-300 hover:shadow-[0_0_20px_rgba(110,231,183,0.05)]"
+          style={{ transitionDelay: `${index * 0.1}s` }}
+        >
+          {/* Top row - repo name + stars */}
+          <div className="flex items-center justify-between">
+            <h3 className="font-mono text-emerald-300 font-medium text-base">
+              <Link href={`/projects/${encodeURIComponent(project.name)}`} className="hover:underline">
+                {formatProjectName(project.name)}
+              </Link>
+            </h3>
+            <a
+              href={project.html_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-slate-500 hover:text-white transition-colors"
+              aria-label={`Open ${project.name} on GitHub`}
+            >
+              <Github className="h-5 w-5" />
+            </a>
+          </div>
+
+          {/* Stars */}
+          <div className="flex items-center gap-1 text-xs text-slate-500 font-mono">
+            <Star className="h-3.5 w-3.5" />
+            <span>{project.stargazers_count}</span>
+          </div>
+
+          {/* Description */}
+          <p className="text-sm text-slate-400 leading-relaxed flex-1">
+            {project.description || "No description provided."}
+          </p>
+
+          {/* Tech tags */}
+          <div className="flex flex-wrap gap-1.5">
+            {"topics" in project && project.topics
+              ? project.topics.map((topic: string) => (
+                  <span
+                    key={topic}
+                    className="px-2 py-0.5 text-[11px] font-mono rounded-full bg-white/5 border border-white/10 text-slate-400"
+                  >
+                    {topic}
+                  </span>
+                ))
+              : 'language' in project && project.language && (
+                  <span className="px-2 py-0.5 text-[11px] font-mono rounded-full bg-white/5 border border-white/10 text-slate-400">
+                    {project.language}
+                  </span>
+                )}
+          </div>
+
+          {/* Links */}
+          <div className="flex items-center justify-between pt-2 border-t border-white/5">
+            <Link
+              href={`/projects/${encodeURIComponent(project.name)}`}
+              className="text-xs text-emerald-300 hover:underline font-medium"
+            >
+              View Case Study →
+            </Link>
+            {project.homepage && (
+              <a
+                href={project.homepage}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-xs text-slate-400 hover:text-white transition-colors"
+              >
+                <ExternalLink className="h-3 w-3" />
+                Live Demo
+              </a>
+            )}
+          </div>
+        </article>
+      ))}
+    </div>
+  )
 }
 
 export async function Projects() {
   const projects = await getProjects()
+  const displayProjects: DisplayProject[] = projects.length > 0 ? projects : STATIC_PROJECTS
 
   return (
     <SectionWrapper id="projects">
-      <div className="flex flex-col gap-12">
-        <SectionHeader
-          label="Projects"
-          heading="Selected client and product work."
-          description="Professional builds and product experiments, backed by live GitHub data and case studies."
-        />
+      <div className="flex flex-col gap-8">
+        <div className="flex flex-col gap-2 max-w-2xl">
+          <span className="text-xs font-mono font-medium text-emerald-300 tracking-widest uppercase">
+            PROJECTS
+          </span>
+          <h2 className="text-3xl md:text-4xl font-semibold tracking-tight text-white text-balance">
+            Selected client and product work.
+          </h2>
+          <p className="text-slate-400 leading-relaxed mt-2">
+            Professional builds and product experiments, backed by live GitHub data and case studies.
+          </p>
+        </div>
 
-        {projects.length === 0 ? (
-          <div className="rounded-xl border border-border bg-card p-6 text-sm text-muted-foreground">
-            Could not load repositories from GitHub. Confirm the username in
-            <code className="mx-1 rounded bg-muted px-1.5 py-0.5 text-foreground">
-              components/projects.tsx
-            </code>
-            and ensure public repos are available.
-          </div>
-        ) : (
-          <div className="grid md:grid-cols-2 gap-6">
-            {projects.map((project) => (
-              <article
-                key={project.id}
-                className="rounded-xl border border-border bg-card p-6 flex flex-col gap-4 hover:border-accent/30 transition-colors"
-              >
-                <div className="overflow-hidden rounded-lg border border-border/60 bg-muted/40">
-                  <img
-                    src={getThumbnailUrl(project)}
-                    alt={`${formatProjectName(project.name)} project thumbnail`}
-                    className="h-40 w-full object-cover"
-                    loading="lazy"
-                  />
-                </div>
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <h3 className="text-lg font-semibold text-foreground break-all">
-                      <Link href={`/projects/${encodeURIComponent(project.name)}`} className="hover:text-accent transition-colors">
-                        {formatProjectName(project.name)}
-                      </Link>
-                    </h3>
-                    <div className="mt-1 flex flex-wrap gap-1.5">
-                      {project.archived ? (
-                        <Badge variant="secondary" className="text-[10px]">
-                          Archived
-                        </Badge>
-                      ) : project.homepage ? (
-                        <Badge variant="secondary" className="text-[10px]">
-                          Live
-                        </Badge>
-                      ) : (
-                        <Badge variant="secondary" className="text-[10px]">
-                          Code only
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-                  <a
-                    href={project.html_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-muted-foreground hover:text-foreground"
-                    aria-label={`Open ${project.name} on GitHub`}
-                  >
-                    <Github className="h-5 w-5" />
-                  </a>
-                </div>
-
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {project.readmeSummary ?? project.description ?? "No description provided."}
-                </p>
-
-                <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                  <span className="inline-flex items-center gap-1">
-                    <Star className="h-3.5 w-3.5" />
-                    {project.stargazers_count}
-                  </span>
-                  <span className="inline-flex items-center gap-1">
-                    <GitFork className="h-3.5 w-3.5" />
-                    {project.forks_count}
-                  </span>
-                </div>
-
-                <div className="mt-auto flex flex-wrap items-center gap-2">
-                  <Link href={`/projects/${encodeURIComponent(project.name)}`} className="inline-flex items-center gap-1 text-xs text-accent hover:underline">
-                    Case Study
-                    <ExternalLink className="h-3.5 w-3.5" />
-                  </Link>
-                  {project.language ? (
-                    <Badge
-                      variant="secondary"
-                      className="text-xs bg-secondary text-secondary-foreground"
-                    >
-                      {project.language}
-                    </Badge>
-                  ) : null}
-                  {project.homepage ? (
-                    <a
-                      href={project.homepage}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-xs text-accent hover:underline"
-                    >
-                      Live Demo
-                      <ExternalLink className="h-3.5 w-3.5" />
-                    </a>
-                  ) : null}
-                </div>
-              </article>
-            ))}
-          </div>
-        )}
+        <ProjectsGrid projects={displayProjects} />
       </div>
     </SectionWrapper>
   )

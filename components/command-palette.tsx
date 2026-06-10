@@ -5,13 +5,14 @@ import { Command } from "cmdk"
 
 const ITEMS = [
   { label: "Home", href: "#main-content" },
+  { label: "Hero", href: "#hero" },
   { label: "About", href: "#about" },
   { label: "Skills", href: "#skills" },
   { label: "Projects", href: "#projects" },
-  { label: "GitHub Activity", href: "#github-activity" },
   { label: "Services", href: "#services" },
-  { label: "Process", href: "#process" },
-  { label: "Currently Building", href: "#currently-building" },
+  { label: "Experience", href: "#experience" },
+  { label: "Testimonials", href: "#testimonials" },
+  { label: "Writing", href: "#blog" },
   { label: "Contact", href: "#contact" },
 ]
 
@@ -29,8 +30,16 @@ export function CommandPalette() {
       }
     }
 
+    const onTogglePalette = () => {
+      setOpen((value) => !value)
+    }
+
     window.addEventListener("keydown", onKeyDown)
-    return () => window.removeEventListener("keydown", onKeyDown)
+    window.addEventListener("toggle-command-palette", onTogglePalette)
+    return () => {
+      window.removeEventListener("keydown", onKeyDown)
+      window.removeEventListener("toggle-command-palette", onTogglePalette)
+    }
   }, [])
 
   const groupedItems = useMemo(() => ITEMS, [])
@@ -38,20 +47,20 @@ export function CommandPalette() {
   if (!open) return null
 
   return (
-    <div className="fixed inset-0 z-[120] bg-background/80 backdrop-blur-sm p-4 md:p-6">
-      <div className="mx-auto max-w-xl rounded-xl border border-border bg-card shadow-xl overflow-hidden">
+    <div className="fixed inset-0 z-[120] bg-black/80 backdrop-blur-sm p-4 md:p-6">
+      <div className="mx-auto max-w-xl rounded-xl border border-[#1e2530] bg-[#12161a] shadow-xl overflow-hidden">
         <Command className="w-full">
-          <div className="border-b border-border">
+          <div className="border-b border-[#1e2530]">
             <Command.Input
               placeholder="Type a section name..."
-              className="w-full bg-transparent px-4 py-3 text-sm outline-none"
+              className="w-full bg-transparent px-4 py-3 text-sm text-white outline-none placeholder:text-slate-500"
             />
           </div>
           <Command.List className="max-h-80 overflow-y-auto p-2">
-            <Command.Empty className="px-2 py-3 text-sm text-muted-foreground">
+            <Command.Empty className="px-2 py-3 text-sm text-slate-500">
               No results found.
             </Command.Empty>
-            <Command.Group heading="Navigate" className="text-xs text-muted-foreground">
+            <Command.Group heading="Navigate" className="text-xs text-slate-500">
               {groupedItems.map((item) => (
                 <Command.Item
                   key={item.href}
@@ -60,7 +69,7 @@ export function CommandPalette() {
                     window.location.hash = item.href.replace("#", "")
                     setOpen(false)
                   }}
-                  className="rounded-md px-3 py-2 text-sm text-foreground cursor-pointer aria-selected:bg-muted"
+                  className="rounded-md px-3 py-2 text-sm text-white cursor-pointer aria-selected:bg-white/10"
                 >
                   {item.label}
                 </Command.Item>

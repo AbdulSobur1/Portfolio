@@ -1,73 +1,46 @@
+"use client"
+
 import { SectionWrapper } from "@/components/section-wrapper"
-import { SectionHeader } from "@/components/section-header"
-import { Quote } from "lucide-react"
+import { AnimatedTestimonials } from "@/components/ui/animated-testimonials"
 
 const testimonials = [
   {
     quote:
       "Abdullah (SoburrX) is consistent, fast to learn, and reliable when it comes to shipping features. He communicates clearly and takes feedback seriously.",
-    name: "Collaborator Feedback",
-    role: "Teammate",
-    verified: true,
-    source: "Project collaboration reference",
+    name: "Project Collaborator",
+    designation: "Teammate — Project Collaboration Reference",
+    src: "https://api.dicebear.com/7.x/initials/svg?seed=PC&backgroundColor=6ee7b7&textColor=0d0f11",
   },
   {
     quote:
       "He handles both frontend and backend tasks with a practical mindset. You can trust him to push work across the finish line.",
-    name: "Project Review",
-    role: "Project Stakeholder",
-    verified: true,
-    source: "Private stakeholder feedback",
+    name: "Project Stakeholder",
+    designation: "Private Stakeholder Feedback",
+    src: "https://api.dicebear.com/7.x/initials/svg?seed=PS&backgroundColor=818cf8&textColor=0d0f11",
   },
   {
     quote:
       "SoburrX keeps improving every release. His code quality, delivery speed, and confidence as a junior full-stack engineer are all trending up.",
-    name: "Mentor Note",
-    role: "Engineering Mentor",
-    verified: true,
-    source: "Mentorship review",
+    name: "Engineering Mentor",
+    designation: "Mentorship Review",
+    src: "https://api.dicebear.com/7.x/initials/svg?seed=EM&backgroundColor=6ee7b7&textColor=0d0f11",
   },
 ]
 
 export function Testimonials() {
   return (
     <SectionWrapper id="testimonials">
-      <div className="flex flex-col gap-12">
-        <SectionHeader
-          label="Testimonials"
-          heading="What people say."
-        />
-
-        {/* Testimonial grid */}
-        <div className="grid md:grid-cols-3 gap-6">
-          {testimonials.map((testimonial, index) => (
-            <figure
-              key={index}
-              className="flex flex-col gap-4 p-6 rounded-xl border border-border bg-card hover:border-accent/30 transition-colors"
-            >
-              <Quote className="h-5 w-5 text-accent/40" aria-hidden="true" />
-              <blockquote className="text-sm text-muted-foreground leading-relaxed flex-1">
-                {`"${testimonial.quote}"`}
-              </blockquote>
-              <figcaption className="pt-4 border-t border-border">
-                <span className="text-sm font-semibold text-foreground block">
-                  {testimonial.name}
-                </span>
-                <span className="text-xs text-muted-foreground">
-                  {testimonial.role}
-                </span>
-                <div className="mt-2 flex items-center gap-2">
-                  {testimonial.verified ? (
-                    <span className="text-[10px] font-medium px-2 py-1 rounded-full border border-accent/30 bg-accent/10 text-accent">
-                      Verified
-                    </span>
-                  ) : null}
-                  <span className="text-[10px] text-muted-foreground">{testimonial.source}</span>
-                </div>
-              </figcaption>
-            </figure>
-          ))}
+      <div className="flex flex-col gap-8">
+        <div className="flex flex-col gap-2 max-w-2xl">
+          <span className="text-xs font-mono font-medium text-emerald-300 tracking-widest uppercase">
+            TESTIMONIALS
+          </span>
+          <h2 className="text-3xl md:text-4xl font-semibold tracking-tight text-white text-balance">
+            What people say.
+          </h2>
         </div>
+
+        <AnimatedTestimonials testimonials={testimonials} autoPlayInterval={5000} />
       </div>
     </SectionWrapper>
   )

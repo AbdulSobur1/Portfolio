@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 
 const CONTACT_EMAIL = "abdullahabdulsobur@gmail.com"
 const RESEND_API_URL = "https://api.resend.com/emails"
+const FORMSUBMIT_URL = "https://formsubmit.co/ajax/abdullahabdulsobur@gmail.com"
 
 function createReferenceId() {
   const rand = Math.random().toString(36).slice(2, 8).toUpperCase()
@@ -88,7 +89,44 @@ export async function POST(request: Request) {
       message: message.trim(),
     }
 
+    // Try Resend first, fall back to FormSubmit if Resend is not configured
     const resend = await sendWithResend({ ...trimmed, referenceId })
+
+    if (!resend.ok && !process.env.RESEND_API_KEY) {
+      // Fallback to FormSubmit
+      try {
+        const formSubmitResponse = await fetch(FORMSUBMIT_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Accept: "application/json" },
+          body: JSON.stringify({
+            name: trimmed.name,
+            email: trimmed.email,
+            message: `[${referenceId}]\n\n${trimmed.message}`,
+          }),
+        })
+
+        if (formSubmitResponse.ok) {
+          return NextResponse.json({
+            success: true,
+            message: "The form was submitted successfully.",
+            referenceId,
+            delivery: "formsubmit",
+          })
+        }
+
+        const raw = await formSubmitResponse.text()
+        return NextResponse.json(
+          { success: false, message: raw.slice(0, 240) },
+          { status: 502 }
+        )
+      } catch {
+        return NextResponse.json(
+          { success: false, message: "FormSubmit delivery failed. Resend is not configured." },
+          { status: 502 }
+        )
+      }
+    }
+
     if (!resend.ok) {
       return NextResponse.json(
         {
