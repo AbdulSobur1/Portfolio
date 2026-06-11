@@ -2,6 +2,8 @@
 
 import { useEffect, useRef } from 'react'
 import { SectionWrapper } from '@/components/section-wrapper'
+import { AmbientOrbs } from '@/components/ui/ambient-orbs'
+import { useScrollReveal } from '@/hooks/use-scroll-reveal'
 
 const EXPERIENCE = [
   {
@@ -34,28 +36,31 @@ const EXPERIENCE = [
 ]
 
 export function Experience() {
-  const listRef = useRef<HTMLDivElement>(null)
+  const revealRef = useScrollReveal()
+  const lineRef = useRef<HTMLDivElement>(null)
 
+  // EFFECT 6 — Timeline draw animation
   useEffect(() => {
-    const entries = listRef.current?.querySelectorAll('.reveal')
-    if (!entries) return
-    const observer = new IntersectionObserver(
-      (obs) => {
-        obs.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('visible')
-            observer.unobserve(entry.target)
-          }
-        })
-      },
-      { threshold: 0.1 }
-    )
-    entries.forEach((el) => observer.observe(el))
+    const line = lineRef.current
+    if (!line) return
+    line.style.height = '0%'
+    line.style.transition = 'height 1.5s ease'
+
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        line.style.height = '100%'
+        observer.disconnect()
+      }
+    }, { threshold: 0.1 })
+
+    const parent = line.parentElement
+    if (parent) observer.observe(parent)
     return () => observer.disconnect()
   }, [])
 
   return (
     <SectionWrapper id="experience">
+      <AmbientOrbs />
       <div className="flex flex-col gap-8">
         <div className="flex flex-col gap-2 max-w-2xl">
           <span className="text-xs font-mono font-medium text-emerald-300 tracking-widest uppercase">
@@ -69,15 +74,21 @@ export function Experience() {
           </p>
         </div>
 
-        <div ref={listRef} className="relative flex flex-col gap-0">
-          {/* vertical line */}
-          <div className="absolute left-[11px] top-3 bottom-3 w-px bg-emerald-300/15 hidden sm:block" />
+        <div ref={revealRef} className="relative flex flex-col gap-0">
+          {/* vertical line — draws on scroll */}
+          <div className="absolute left-[11px] top-2 bottom-2 overflow-hidden hidden sm:block">
+            <div
+              ref={lineRef}
+              className="w-px bg-gradient-to-b from-emerald-300/60 via-emerald-300/30 to-transparent"
+              style={{ height: '0%' }}
+            />
+          </div>
 
           {EXPERIENCE.map((exp, i) => (
             <div
               key={i}
-              className="reveal relative sm:pl-10 pb-10 last:pb-0"
-              style={{ transitionDelay: `${i * 120}ms` }}
+              data-reveal
+              className="relative sm:pl-10 pb-10 last:pb-0"
             >
               {/* dot */}
               <div className="hidden sm:flex absolute left-0 top-1.5 h-6 w-6 rounded-full border-2 border-emerald-300/60 bg-[#0d0f11] items-center justify-center">

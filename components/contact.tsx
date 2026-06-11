@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { SectionWrapper } from "@/components/section-wrapper"
 import { FormField } from "@/components/form-field"
+import { AmbientOrbs } from "@/components/ui/ambient-orbs"
 import { CONTACT_EMAIL, SCHEDULING_URL } from "@/lib/constants"
 
 export function Contact() {
@@ -88,6 +89,7 @@ export function Contact() {
 
   return (
     <SectionWrapper id="contact">
+      <AmbientOrbs variant="subtle" />
       <div className="grid md:grid-cols-2 gap-12 lg:gap-16">
         {/* Left column — full redesign */}
         <div className="flex flex-col gap-8">

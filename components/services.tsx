@@ -3,6 +3,7 @@
 import { Code2, Server, Rocket } from "lucide-react"
 import { SectionWrapper } from "@/components/section-wrapper"
 import { HoverButton } from "@/components/ui/hover-button"
+import { useScrollReveal } from "@/hooks/use-scroll-reveal"
 
 const services = [
   {
@@ -41,6 +42,21 @@ const services = [
 ]
 
 export function Services() {
+  const revealRef = useScrollReveal()
+
+  const handleTiltMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (window.matchMedia('(pointer: coarse)').matches) return
+    const el = e.currentTarget
+    const rect = el.getBoundingClientRect()
+    const x = (e.clientX - rect.left) / rect.width - 0.5
+    const y = (e.clientY - rect.top) / rect.height - 0.5
+    el.style.transform = `perspective(800px) rotateX(${y * -5}deg) rotateY(${x * 5}deg) scale3d(1.02, 1.02, 1.02)`
+  }
+
+  const handleTiltLeave = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.currentTarget.style.transform = 'perspective(800px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)'
+  }
+
   return (
     <SectionWrapper id="services">
       <div className="flex flex-col gap-8">
@@ -56,10 +72,14 @@ export function Services() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-4 md:gap-6">
+        <div ref={revealRef} className="grid md:grid-cols-3 gap-4 md:gap-6">
           {services.map((service) => (
             <article
               key={service.title}
+              data-reveal
+              onMouseMove={handleTiltMove}
+              onMouseLeave={handleTiltLeave}
+              style={{ transition: 'transform 0.15s ease-out', willChange: 'transform' }}
               className="rounded-xl border border-[#1e2530] bg-[#12161a] p-6 flex flex-col gap-4 hover:border-emerald-300/20 transition-all duration-300 group"
             >
               <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-emerald-300/10 group-hover:bg-emerald-300/20 transition-colors">

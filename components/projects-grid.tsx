@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useScrollReveal } from '@/hooks/use-scroll-reveal'
 import { ExternalLink, Github, Star } from 'lucide-react'
 import Link from 'next/link'
 
@@ -16,33 +16,31 @@ interface Project {
 }
 
 export function ProjectsGrid({ projects }: { projects: Project[] }) {
-  const gridRef = useRef<HTMLDivElement>(null)
+  const revealRef = useScrollReveal()
 
-  useEffect(() => {
-    const cards = gridRef.current?.querySelectorAll('.reveal')
-    if (!cards) return
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('visible')
-            observer.unobserve(entry.target)
-          }
-        })
-      },
-      { threshold: 0.1 }
-    )
-    cards.forEach((card) => observer.observe(card))
-    return () => observer.disconnect()
-  }, [])
+  const handleTiltMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (window.matchMedia('(pointer: coarse)').matches) return
+    const el = e.currentTarget
+    const rect = el.getBoundingClientRect()
+    const x = (e.clientX - rect.left) / rect.width - 0.5
+    const y = (e.clientY - rect.top) / rect.height - 0.5
+    el.style.transform = `perspective(800px) rotateX(${y * -6}deg) rotateY(${x * 6}deg) scale3d(1.02, 1.02, 1.02)`
+  }
+
+  const handleTiltLeave = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.currentTarget.style.transform = 'perspective(800px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)'
+  }
 
   return (
-    <div ref={gridRef} className="grid md:grid-cols-2 gap-5">
-      {projects.map((project, index) => (
+    <div ref={revealRef} className="grid md:grid-cols-2 gap-5">
+      {projects.map((project) => (
         <article
           key={project.id}
-          className="reveal group rounded-xl border border-[#1e2530] bg-[#12161a] p-6 flex flex-col gap-4 hover:border-emerald-300/20 hover:shadow-[0_0_20px_rgba(110,231,183,0.05)] transition-all duration-300"
-          style={{ transitionDelay: `${index * 80}ms` }}
+          data-reveal
+          onMouseMove={handleTiltMove}
+          onMouseLeave={handleTiltLeave}
+          style={{ transition: 'transform 0.15s ease-out', willChange: 'transform' }}
+          className="group rounded-xl border border-[#1e2530] bg-[#12161a] p-6 flex flex-col gap-4 hover:border-emerald-300/20 hover:shadow-[0_0_20px_rgba(110,231,183,0.05)] transition-all duration-300"
         >
           <div className="flex items-start justify-between gap-2">
             <h3 className="font-mono text-emerald-300 font-semibold text-base leading-snug">

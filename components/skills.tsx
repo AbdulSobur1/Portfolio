@@ -3,6 +3,7 @@
 import { SectionWrapper } from "@/components/section-wrapper"
 import { ShimmerText } from "@/components/ui/shimmer-text"
 import { FeatureSection } from "@/components/ui/feature-section"
+import { AmbientOrbs } from "@/components/ui/ambient-orbs"
 
 const skillData = {
   frontend: [
@@ -68,6 +69,7 @@ const steps = [
 export function Skills() {
   return (
     <SectionWrapper id="skills">
+      <AmbientOrbs variant="subtle" />
       <div className="flex flex-col gap-8">
         <div className="flex flex-col gap-2 max-w-2xl">
           <span className="text-xs font-mono font-medium text-emerald-300 tracking-widest uppercase">

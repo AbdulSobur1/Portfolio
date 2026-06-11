@@ -3,6 +3,8 @@
 import { Download, Ship, Code2, Brain, GraduationCap } from "lucide-react"
 import { DotPattern } from "@/components/ui/dot-pattern"
 import { SectionWrapper } from "@/components/section-wrapper"
+import { AmbientOrbs } from "@/components/ui/ambient-orbs"
+import { useScrollReveal } from "@/hooks/use-scroll-reveal"
 import { HIRE_ME_URL, RESUME_URL } from "@/lib/constants"
 
 const philosophyCards = [
@@ -29,8 +31,24 @@ const philosophyCards = [
 ]
 
 export function About() {
+  const revealRef = useScrollReveal()
+
+  const handleTiltMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (window.matchMedia('(pointer: coarse)').matches) return
+    const el = e.currentTarget
+    const rect = el.getBoundingClientRect()
+    const x = (e.clientX - rect.left) / rect.width - 0.5
+    const y = (e.clientY - rect.top) / rect.height - 0.5
+    el.style.transform = `perspective(800px) rotateX(${y * -4}deg) rotateY(${x * 4}deg) scale3d(1.02, 1.02, 1.02)`
+  }
+
+  const handleTiltLeave = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.currentTarget.style.transform = 'perspective(800px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)'
+  }
+
   return (
     <SectionWrapper id="about">
+      <AmbientOrbs variant="subtle" />
       <div className="grid md:grid-cols-2 gap-12 lg:gap-16">
         {/* Left column */}
         <div className="flex flex-col gap-6">
@@ -68,10 +86,14 @@ export function About() {
         {/* Right column - Philosophy cards */}
         <div className="relative">
           <DotPattern dotColor="#6ee7b7" dotOpacity={0.08} />
-          <div className="relative grid grid-cols-2 gap-3">
+          <div ref={revealRef} className="relative grid grid-cols-2 gap-3">
             {philosophyCards.map((item) => (
               <div
                 key={item.title}
+                data-reveal
+                onMouseMove={handleTiltMove}
+                onMouseLeave={handleTiltLeave}
+                style={{ transition: 'transform 0.15s ease-out', willChange: 'transform' }}
                 className="group p-4 rounded-lg border border-[#1e2530] bg-[#12161a] hover:border-emerald-300/30 hover:scale-[1.02] transition-all duration-300"
               >
                 <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-300/10">
