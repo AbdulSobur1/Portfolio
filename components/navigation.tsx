@@ -131,7 +131,7 @@ export function Navigation() {
             <button
               className="flex items-center gap-1 px-2 py-1.5 text-xs font-medium text-slate-500 border border-white/10 rounded-md"
               onClick={() => {
-                window.dispatchEvent(new KeyboardEvent("keydown", { metaKey: true, key: "k", bubbles: true }))
+                window.dispatchEvent(new CustomEvent("toggle-command-palette"))
               }}
             >
               <Command className="h-3.5 w-3.5" />
