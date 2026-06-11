@@ -28,46 +28,46 @@ interface StaticProject {
 
 type DisplayProject = GithubRepo | StaticProject
 
-const STATIC_PROJECTS = [
+const STATIC_PROJECTS: StaticProject[] = [
   {
     id: 1,
     name: "UmmahConnect",
     html_url: "https://github.com/AbdulSobur1/UmmahConnect",
     homepage: null,
-    description: "A community platform for Muslim communities to connect, share events, and manage resources.",
+    description: "Muslim professional networking platform. Auth, community features, real-time messaging. Built with Next.js, Drizzle ORM, Neon, and Auth.js.",
     language: "TypeScript",
     stargazers_count: 0,
-    topics: ["Next.js", "PostgreSQL", "Tailwind"],
+    topics: ["Next.js", "Drizzle", "Auth.js", "Neon"],
   },
   {
     id: 2,
-    name: "MedCore",
+    name: "MedCore HMS",
     html_url: "https://github.com/AbdulSobur1/MedCore",
     homepage: null,
-    description: "Healthcare management system with patient records, appointments, and analytics dashboard.",
+    description: "Hospital Management System with role-based routing, patient records, appointments, and analytics dashboard.",
     language: "TypeScript",
     stargazers_count: 0,
-    topics: ["React", "Node.js", "PostgreSQL"],
+    topics: ["React 19", "Tailwind v4", "Zod", "Next.js"],
   },
   {
     id: 3,
     name: "Portfolio",
     html_url: "https://github.com/AbdulSobur1/Portfolio",
     homepage: "https://portfolio-lyart-alpha-11.vercel.app",
-    description: "Personal portfolio site built with Next.js, shadcn/ui, and modern design patterns.",
+    description: "Personal portfolio with Spline 3D hero, command palette, case study pages, writing routes, and GitHub API integration.",
     language: "TypeScript",
-    stargazers_count: 0,
-    topics: ["Next.js", "shadcn/ui", "Tailwind"],
+    stargazers_count: 2,
+    topics: ["Next.js", "shadcn/ui", "21st.dev", "Spline"],
   },
   {
     id: 4,
     name: "NexaChat",
     html_url: "https://github.com/AbdulSobur1/NexaChat",
     homepage: null,
-    description: "Real-time chat application with WebSocket support and modern UI.",
-    language: "TypeScript",
+    description: "Android chat app with real-time messaging, Firebase Auth, and modern Material 3 UI built in Kotlin with Jetpack Compose.",
+    language: "Kotlin",
     stargazers_count: 0,
-    topics: ["React", "WebSockets", "Node.js"],
+    topics: ["Kotlin", "Jetpack Compose", "Firebase"],
   },
 ]
 
