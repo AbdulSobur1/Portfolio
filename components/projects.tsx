@@ -1,110 +1,84 @@
-import { SectionWrapper } from "@/components/section-wrapper"
-import { ProjectsGrid } from "@/components/projects-grid"
-import { GITHUB_USERNAME } from "@/lib/constants"
+import { SectionWrapper } from '@/components/section-wrapper'
+import { ProjectsGrid } from '@/components/projects-grid'
 
-type GithubRepo = {
-  id: number
-  name: string
-  html_url: string
-  homepage: string | null
-  description: string | null
-  readme_summary?: string | null
-  language: string | null
-  stargazers_count: number
-  updated_at: string
-  fork: boolean
-}
-
-interface StaticProject {
-  id: number
-  name: string
-  html_url: string
-  homepage: string | null
-  description: string | null
-  language: string
-  stargazers_count: number
-  topics: string[]
-}
-
-type DisplayProject = GithubRepo | StaticProject
-
-const STATIC_PROJECTS: StaticProject[] = [
+const STATIC_PROJECTS = [
   {
     id: 1,
-    name: "UmmahConnect",
-    html_url: "https://github.com/AbdulSobur1/UmmahConnect",
+    name: 'UmmahConnect',
+    html_url: 'https://github.com/AbdulSobur1/UmmahConnect',
     homepage: null,
-    description: "Muslim professional networking platform. Auth, community features, real-time messaging. Built with Next.js, Drizzle ORM, Neon, and Auth.js.",
-    language: "TypeScript",
+    description: 'Muslim professional networking platform. Auth, community features, real-time messaging. Built with Next.js, Drizzle ORM, Neon, and Auth.js.',
+    language: 'TypeScript',
     stargazers_count: 0,
-    topics: ["Next.js", "Drizzle", "Auth.js", "Neon"],
+    topics: ['Next.js', 'Drizzle', 'Auth.js', 'Neon'],
   },
   {
     id: 2,
-    name: "MedCore HMS",
-    html_url: "https://github.com/AbdulSobur1/MedCore",
+    name: 'MedCore HMS',
+    html_url: 'https://github.com/AbdulSobur1/MedCore',
     homepage: null,
-    description: "Hospital Management System with role-based routing, patient records, appointments, and analytics dashboard.",
-    language: "TypeScript",
+    description: 'Hospital Management System with role-based routing, patient records, appointments, and an analytics dashboard.',
+    language: 'TypeScript',
     stargazers_count: 0,
-    topics: ["React 19", "Tailwind v4", "Zod", "Next.js"],
+    topics: ['React 19', 'Tailwind v4', 'Zod', 'Next.js'],
   },
   {
     id: 3,
-    name: "Portfolio",
-    html_url: "https://github.com/AbdulSobur1/Portfolio",
-    homepage: "https://portfolio-lyart-alpha-11.vercel.app",
-    description: "Personal portfolio with Spline 3D hero, command palette, case study pages, writing routes, and GitHub API integration.",
-    language: "TypeScript",
+    name: 'Portfolio',
+    html_url: 'https://github.com/AbdulSobur1/Portfolio',
+    homepage: 'https://portfolio-lyart-alpha-11.vercel.app',
+    description: 'Personal portfolio with Spline 3D hero, command palette, case study pages, writing routes, and GitHub API integration.',
+    language: 'TypeScript',
     stargazers_count: 2,
-    topics: ["Next.js", "shadcn/ui", "21st.dev", "Spline"],
+    topics: ['Next.js', 'shadcn/ui', 'Spline', 'Tailwind'],
   },
   {
     id: 4,
-    name: "NexaChat",
-    html_url: "https://github.com/AbdulSobur1/NexaChat",
+    name: 'NexaChat',
+    html_url: 'https://github.com/AbdulSobur1/NexaChat',
     homepage: null,
-    description: "Android chat app with real-time messaging, Firebase Auth, and modern Material 3 UI built in Kotlin with Jetpack Compose.",
-    language: "Kotlin",
+    description: 'Android chat app with real-time messaging, Firebase Auth, and Material 3 UI in Kotlin with Jetpack Compose.',
+    language: 'Kotlin',
     stargazers_count: 0,
-    topics: ["Kotlin", "Jetpack Compose", "Firebase"],
+    topics: ['Kotlin', 'Jetpack Compose', 'Firebase'],
   },
 ]
 
-async function getProjects(): Promise<GithubRepo[]> {
+async function fetchProjects() {
   try {
-    const headers: Record<string, string> = {}
-    if (process.env.GITHUB_TOKEN) {
-      headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`
-    }
-
-    const response = await fetch(
-      `https://api.github.com/users/${GITHUB_USERNAME}/repos?per_page=100&sort=updated`,
-      { cache: "no-store", headers }
+    const res = await fetch(
+      'https://api.github.com/users/AbdulSobur1/repos?per_page=100&sort=updated',
+      {
+        cache: 'no-store',
+        headers: process.env.GITHUB_TOKEN
+          ? { Authorization: `Bearer ${process.env.GITHUB_TOKEN}` }
+          : {},
+      }
     )
-
-    if (!response.ok) {
-      return []
-    }
-
-    const repos = (await response.json()) as GithubRepo[]
-    return repos
-      .filter((repo) => !repo.fork)
-      .sort((a, b) => {
-        if (b.stargazers_count !== a.stargazers_count) {
-          return b.stargazers_count - a.stargazers_count
-        }
-        return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
-      })
+    if (!res.ok) return []
+    const data = await res.json()
+    return (data as any[])
+      .filter((r: any) => !r.fork && r.description)
+      .sort((a: any, b: any) => b.stargazers_count - a.stargazers_count)
       .slice(0, 8)
+      .map((r: any) => ({
+        id: r.id,
+        name: r.name,
+        html_url: r.html_url,
+        homepage: r.homepage ?? null,
+        description: r.description,
+        language: r.language,
+        stargazers_count: r.stargazers_count,
+        topics: r.topics?.length ? r.topics : [r.language].filter(Boolean),
+      }))
   } catch {
     return []
   }
 }
 
 export async function Projects() {
-  const projects = await getProjects()
-  const displayProjects: DisplayProject[] = projects.length > 0 ? projects : STATIC_PROJECTS
+  const fetched = await fetchProjects()
+  const projects = fetched.length > 0 ? fetched : STATIC_PROJECTS
 
   return (
     <SectionWrapper id="projects">
@@ -113,15 +87,14 @@ export async function Projects() {
           <span className="text-xs font-mono font-medium text-emerald-300 tracking-widest uppercase">
             PROJECTS
           </span>
-          <h2 className="text-3xl md:text-4xl font-semibold tracking-tight text-white text-balance">
+          <h2 className="text-3xl md:text-4xl font-bold text-white leading-tight">
             Selected client and product work.
           </h2>
-          <p className="text-slate-400 leading-relaxed mt-2">
-            Professional builds and product experiments, backed by live GitHub data and case studies.
+          <p className="text-slate-400 text-base leading-relaxed mt-1">
+            Professional builds and product experiments, backed by live GitHub data.
           </p>
         </div>
-
-        <ProjectsGrid projects={displayProjects} />
+        <ProjectsGrid projects={projects} />
       </div>
     </SectionWrapper>
   )

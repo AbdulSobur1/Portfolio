@@ -2,7 +2,6 @@
 
 import { Download, Ship, Code2, Brain, GraduationCap } from "lucide-react"
 import { DotPattern } from "@/components/ui/dot-pattern"
-import { RetroButton } from "@/components/ui/retro-button"
 import { SectionWrapper } from "@/components/section-wrapper"
 import { HIRE_ME_URL, RESUME_URL } from "@/lib/constants"
 
@@ -53,18 +52,16 @@ export function About() {
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
-            <RetroButton asChild variant="default">
-              <a href={RESUME_URL} download>
-                <Download className="h-4 w-4" />
-                Download Resume
-              </a>
-            </RetroButton>
-            <RetroButton asChild variant="secondary">
-              <a href={HIRE_ME_URL} download>
-                <Download className="h-4 w-4" />
-                Download Hire-Me PDF
-              </a>
-            </RetroButton>
+            <a href={RESUME_URL} download
+              className="bg-emerald-300 text-black hover:bg-emerald-200 font-semibold px-5 py-2.5 rounded-lg text-sm flex items-center gap-2 transition-colors">
+              <Download className="h-4 w-4" />
+              Download Resume
+            </a>
+            <a href={HIRE_ME_URL} download
+              className="border border-white/20 text-slate-300 hover:border-emerald-300/40 hover:text-white font-medium px-5 py-2.5 rounded-lg text-sm flex items-center gap-2 transition-colors">
+              <Download className="h-4 w-4" />
+              Download Hire-Me PDF
+            </a>
           </div>
         </div>
 

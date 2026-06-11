@@ -6,15 +6,14 @@ import { FeatureSection } from "@/components/ui/feature-section"
 
 const skillData = {
   frontend: [
-    "React", "Next.js", "TypeScript", "Tailwind CSS", "Three.js",
+    "React", "Next.js", "TypeScript", "Tailwind CSS",
     "HTML/CSS", "JavaScript ES6+", "Responsive Design", "Accessibility",
   ],
   backend: [
     "Node.js", "Python", "GraphQL", "REST APIs", "WebSockets",
-    "Microservices", "Docker", "CI/CD", "Serverless",
   ],
   databases: [
-    "PostgreSQL", "MongoDB", "DynamoDB", "Neon", "Prisma", "Drizzle", "Supabase",
+    "PostgreSQL", "MongoDB", "Neon", "Prisma", "Drizzle", "Supabase",
   ],
 }
 

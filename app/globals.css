@@ -6,6 +6,15 @@
   .text-balance {
     text-wrap: balance;
   }
+  .reveal {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @layer base {
@@ -77,15 +86,7 @@
 }
 
 @layer utilities {
-  .fade-in-up {
-    opacity: 0;
-    transform: translateY(16px);
-    transition: opacity 0.5s ease, transform 0.5s ease;
-  }
-  .fade-in-up.visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
+
   .glow-text {
     text-shadow: 0 0 20px rgba(110, 231, 183, 0.4);
   }
