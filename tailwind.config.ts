@@ -104,6 +104,10 @@ const config: Config = {
           '0%': { opacity: '0', transform: 'translateY(16px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
         },
+        'drift-subtle': {
+          '0%, 100%': { transform: 'translate(0px, 0px)' },
+          '50%': { transform: 'translate(10px, -10px)' },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
@@ -112,6 +116,7 @@ const config: Config = {
         shimmer: 'shimmer 3s linear infinite',
         spotlight: 'spotlight 2s ease 0.5s forwards',
         fadeInUp: 'fadeInUp 0.5s ease forwards',
+        'drift-subtle': 'drift-subtle 8s ease-in-out infinite',
       },
     },
   },

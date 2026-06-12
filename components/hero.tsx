@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect } from "react"
 import { ArrowRight, ArrowDown } from "lucide-react"
 import { NumberTicker } from "@/components/ui/number-ticker"
 import { Spotlight } from "@/components/ui/spotlight"
@@ -13,7 +13,7 @@ const SplineScene = dynamic(
   { ssr: false, loading: () => <div className="h-full w-full flex items-center justify-center"><div className="h-8 w-8 animate-pulse rounded-full bg-emerald-300/20" /></div> }
 )
 
-const techStack = [
+const TECH = [
   "React", "Next.js", "TypeScript", "Node.js", "Tailwind CSS",
   "PostgreSQL", "Drizzle", "Python", "GraphQL", "WebSockets",
   "Kotlin", "Jetpack Compose",
@@ -21,199 +21,155 @@ const techStack = [
 
 export function Hero() {
   const [mounted, setMounted] = useState(false)
-  const badgeRef = useRef<HTMLDivElement>(null)
-  const headlineRef = useRef<HTMLHeadingElement>(null)
-  const sublineRef = useRef<HTMLParagraphElement>(null)
-  const statsRef = useRef<HTMLDivElement>(null)
-  const ctaRef = useRef<HTMLDivElement>(null)
-
   useEffect(() => setMounted(true), [])
 
-  // EFFECT 1 — Mouse parallax on hero text layers
+  // Mouse parallax on hero text layers
   useEffect(() => {
-    if (typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches) return
+    if (typeof window === "undefined") return
+    if (window.matchMedia("(pointer: coarse)").matches) return
 
-    const section = document.getElementById('hero')
+    const section = document.getElementById("hero")
     if (!section) return
 
-    const handleMouseMove = (e: MouseEvent) => {
+    const layers: Array<{ selector: string; factor: number }> = [
+      { selector: '[data-parallax="badge"]', factor: 4 },
+      { selector: '[data-parallax="headline"]', factor: 9 },
+      { selector: '[data-parallax="sub"]', factor: 6 },
+      { selector: '[data-parallax="stats"]', factor: 7 },
+      { selector: '[data-parallax="cta"]', factor: 3 },
+    ]
+
+    const handleMove = (e: MouseEvent) => {
       const rect = section.getBoundingClientRect()
       const x = ((e.clientX - rect.left) / rect.width - 0.5) * 2
       const y = ((e.clientY - rect.top) / rect.height - 0.5) * 2
-
-      if (badgeRef.current) {
-        badgeRef.current.style.transform = `translate(${x * 4}px, ${y * 4}px)`
-      }
-      if (headlineRef.current) {
-        headlineRef.current.style.transform = `translate(${x * 8}px, ${y * 8}px)`
-      }
-      if (sublineRef.current) {
-        sublineRef.current.style.transform = `translate(${x * 5}px, ${y * 5}px)`
-      }
-      if (statsRef.current) {
-        statsRef.current.style.transform = `translate(${x * 6}px, ${y * 6}px)`
-      }
-      if (ctaRef.current) {
-        ctaRef.current.style.transform = `translate(${x * 3}px, ${y * 3}px)`
-      }
-    }
-
-    const handleMouseLeave = () => {
-      ;[badgeRef, headlineRef, sublineRef, statsRef, ctaRef].forEach(ref => {
-        if (ref.current) {
-          ref.current.style.transform = 'translate(0px, 0px)'
-        }
+      layers.forEach(({ selector, factor }) => {
+        const el = section.querySelector<HTMLElement>(selector)
+        if (el) el.style.transform = `translate(${x * factor}px, ${y * factor}px)`
       })
     }
 
-    section.addEventListener('mousemove', handleMouseMove)
-    section.addEventListener('mouseleave', handleMouseLeave)
-    return () => {
-      section.removeEventListener('mousemove', handleMouseMove)
-      section.removeEventListener('mouseleave', handleMouseLeave)
+    const handleLeave = () => {
+      layers.forEach(({ selector }) => {
+        const el = section.querySelector<HTMLElement>(selector)
+        if (el) el.style.transform = "translate(0px, 0px)"
+      })
     }
-  }, [])
 
-  if (!mounted) {
-    return (
-      <section className="relative min-h-screen flex items-center justify-center bg-black/[0.96]" />
-    )
-  }
+    section.addEventListener("mousemove", handleMove)
+    section.addEventListener("mouseleave", handleLeave)
+    return () => {
+      section.removeEventListener("mousemove", handleMove)
+      section.removeEventListener("mouseleave", handleLeave)
+    }
+  }, [mounted])
 
   return (
     <>
-      <section
-        id="hero"
-        className="relative min-h-[90vh] bg-black/[0.96] overflow-hidden"
-      >
-        <Spotlight className="-top-40 left-0 md:left-60 md:-top-20" fill="#6ee7b7" />
+      <section id="hero">
+        <div className="w-full min-h-screen bg-black/[0.96] relative overflow-hidden rounded-none border-0">
+          <Spotlight className="-top-40 left-0 md:left-60 md:-top-20" fill="#6ee7b7" />
+          <div className="flex flex-col md:flex-row min-h-screen">
+            {/* LEFT — always SSR rendered */}
+            <div className="flex-1 px-6 py-24 md:px-16 md:py-0 relative z-10 flex flex-col justify-center gap-6">
+              {/* availability badge — always rendered */}
+              <div
+                data-parallax="badge"
+                style={{ transition: "transform 0.12s ease-out", willChange: "transform" }}
+                className="flex items-center gap-2 w-fit px-3 py-1 rounded-full border border-emerald-300/20 bg-emerald-300/5"
+              >
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-300 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-300" />
+                </span>
+                <span className="text-xs font-medium text-emerald-300">Available for opportunities</span>
+              </div>
 
-        <div className="flex flex-col md:flex-row h-full min-h-[90vh]">
-          {/* LEFT - Content */}
-          <div className="flex-1 p-8 md:p-16 relative z-10 flex flex-col justify-center gap-6">
-            {/* Availability badge */}
-            <div
-              ref={badgeRef}
-              className="flex items-center gap-2"
-              style={{ transition: 'transform 0.15s ease-out', willChange: 'transform' }}
-            >
-              <span className="relative flex h-2.5 w-2.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-300 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-300" />
-              </span>
-              <span className="text-sm font-medium text-emerald-300/80">
-                Available for opportunities
-              </span>
+              {/* headline — always rendered, SSR visible */}
+              <h1
+                data-parallax="headline"
+                style={{ transition: "transform 0.12s ease-out", willChange: "transform" }}
+                className="text-4xl sm:text-5xl lg:text-7xl font-black leading-[1.05] tracking-tight"
+              >
+                <span className="bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-400">
+                  I&apos;m SoburrX,<br />I build products<br />that{" "}
+                </span>
+                <span className="text-emerald-300" style={{ textShadow: "0 0 24px rgba(110,231,183,0.35)" }}>
+                  ship and scale.
+                </span>
+              </h1>
+
+              <p
+                data-parallax="sub"
+                style={{ transition: "transform 0.12s ease-out", willChange: "transform" }}
+                className="text-neutral-400 text-base md:text-lg max-w-md leading-relaxed"
+              >
+                Junior Full Stack Engineer. React, Next.js, TypeScript — from idea to deployed product.
+              </p>
+
+              {/* stats — only NumberTicker needs mounted gate */}
+              <div
+                data-parallax="stats"
+                style={{ transition: "transform 0.12s ease-out", willChange: "transform" }}
+                className="flex gap-8"
+              >
+                <div>
+                  <p className="text-3xl font-black text-white tabular-nums">
+                    {mounted ? <NumberTicker value={3} /> : "3"}
+                    <span className="text-emerald-300">+</span>
+                  </p>
+                  <p className="text-xs text-slate-500 uppercase tracking-wider mt-0.5">Years Exp</p>
+                </div>
+                <div>
+                  <p className="text-3xl font-black text-white tabular-nums">
+                    {mounted ? <NumberTicker value={8} /> : "8"}
+                    <span className="text-emerald-300">+</span>
+                  </p>
+                  <p className="text-xs text-slate-500 uppercase tracking-wider mt-0.5">Shipped</p>
+                </div>
+              </div>
+
+              {/* CTAs — always rendered */}
+              <div
+                data-parallax="cta"
+                style={{ transition: "transform 0.12s ease-out", willChange: "transform" }}
+                className="flex flex-wrap gap-3 items-center"
+              >
+                <HoverButton href="#contact">
+                  Work With Me <ArrowRight className="ml-2 h-4 w-4 inline-block" />
+                </HoverButton>
+                <RetroButton asChild>
+                  <a href="#projects">View Projects</a>
+                </RetroButton>
+              </div>
             </div>
 
-            {/* Headline */}
-            <h1
-              ref={headlineRef}
-              className="text-5xl md:text-7xl font-black text-white leading-none"
-              style={{ transition: 'transform 0.15s ease-out', willChange: 'transform' }}
-            >
-              I&apos;m SoburrX,<br />
-              I build products that<br />
-              <span className="text-emerald-300 glow-text">ship and scale.</span>
-            </h1>
-
-            {/* Subheading */}
-            <p
-              ref={sublineRef}
-              className="text-slate-400 text-lg max-w-md leading-relaxed"
-              style={{ transition: 'transform 0.15s ease-out', willChange: 'transform' }}
-            >
-              Junior Full Stack Engineer with 3 years of experience.
-              React, Next.js, TypeScript &mdash; from idea to deployed product.
-            </p>
-
-            {/* Stats row */}
-            <div
-              ref={statsRef}
-              className="flex gap-8"
-              style={{ transition: 'transform 0.15s ease-out', willChange: 'transform' }}
-            >
-              <div className="flex flex-col">
-                <span className="text-3xl md:text-4xl font-black text-white tabular-nums">
-                  <NumberTicker value={3} />
-                  <span className="text-emerald-300 text-2xl">+</span>
-                </span>
-                <span className="text-xs text-slate-500 font-medium uppercase tracking-wider">
-                  Years Exp
-                </span>
-              </div>
-              <div className="flex flex-col">
-                <span className="text-3xl md:text-4xl font-black text-white tabular-nums">
-                  <NumberTicker value={8} />
-                  <span className="text-emerald-300 text-2xl">+</span>
-                </span>
-                <span className="text-xs text-slate-500 font-medium uppercase tracking-wider">
-                  Shipped
-                </span>
-              </div>
-            </div>
-
-            {/* CTAs */}
-            <div
-              ref={ctaRef}
-              className="flex gap-4 flex-wrap"
-              style={{ transition: 'transform 0.15s ease-out', willChange: 'transform' }}
-            >
-              <HoverButton href="#contact">
-                Work With Me
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </HoverButton>
-              <RetroButton asChild>
-                <a href="#projects">View Projects</a>
-              </RetroButton>
+            {/* RIGHT — Spline only renders client-side, hidden on mobile */}
+            <div className="hidden md:flex flex-1 relative">
+              {mounted && (
+                <SplineScene
+                  scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
+                  className="w-full h-full"
+                />
+              )}
             </div>
           </div>
 
-          {/* RIGHT - Spline 3D Scene */}
-          <div className="flex-1 relative min-h-[400px] md:min-h-full">
-            <SplineScene
-              scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
-              className="w-full h-full"
-            />
-          </div>
+          <a href="#about" aria-label="Scroll down"
+            className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-slate-500 hover:text-emerald-300 transition-colors z-10"
+          >
+            <span className="text-[10px] font-medium tracking-widest uppercase">Scroll</span>
+            <ArrowDown className="h-4 w-4 animate-bounce" />
+          </a>
         </div>
-
-        {/* Scroll indicator */}
-        <a
-          href="#about"
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-slate-500 hover:text-emerald-300 transition-colors z-10"
-          aria-label="Scroll to about section"
-        >
-          <span className="text-[10px] font-medium tracking-widest uppercase">
-            Scroll
-          </span>
-          <ArrowDown className="h-4 w-4 animate-bounce" />
-        </a>
       </section>
 
-      {/* Tech Stack Marquee */}
-      <div className="w-full bg-[#0a0c0e] border-t border-b border-white/5 py-4 overflow-hidden relative">
-        <div className="flex overflow-hidden">
-          <div className="flex shrink-0 items-center gap-8 animate-marquee" aria-hidden="true">
-            {techStack.map((tech) => (
-              <span
-                key={tech}
-                className="text-sm font-mono text-slate-500 whitespace-nowrap"
-              >
-                {tech}
-              </span>
-            ))}
-          </div>
-          <div className="flex shrink-0 items-center gap-8 animate-marquee" aria-hidden="true">
-            {techStack.map((tech) => (
-              <span
-                key={tech}
-                className="text-sm font-mono text-slate-500 whitespace-nowrap"
-              >
-                {tech}
-              </span>
-            ))}
-          </div>
+      {/* Marquee */}
+      <div className="w-full overflow-hidden bg-[#0a0c0e] border-t border-b border-white/5 py-3">
+        <div className="flex w-max animate-marquee">
+          {[...TECH, ...TECH].map((t, i) => (
+            <span key={i} className="text-sm font-mono text-slate-500 whitespace-nowrap px-5">{t}</span>
+          ))}
         </div>
       </div>
     </>

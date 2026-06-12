@@ -89,7 +89,7 @@ export function Contact() {
 
   return (
     <SectionWrapper id="contact">
-      <AmbientOrbs variant="subtle" />
+      <AmbientOrbs opacity="0.05" />
       <div className="grid md:grid-cols-2 gap-12 lg:gap-16">
         {/* Left column — full redesign */}
         <div className="flex flex-col gap-8">

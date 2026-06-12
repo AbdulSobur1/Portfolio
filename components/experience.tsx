@@ -60,7 +60,7 @@ export function Experience() {
 
   return (
     <SectionWrapper id="experience">
-      <AmbientOrbs />
+      <AmbientOrbs opacity="0.05" />
       <div className="flex flex-col gap-8">
         <div className="flex flex-col gap-2 max-w-2xl">
           <span className="text-xs font-mono font-medium text-emerald-300 tracking-widest uppercase">
